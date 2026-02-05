@@ -253,7 +253,7 @@
         }
 
         .right-panel {
-            width: 220px;
+            width: 260px;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
@@ -349,9 +349,15 @@
             animation: pulse 2s infinite;
         }
 
+        @media (max-width: 900px) {
+            .right-panel {
+                width: 220px;
+            }
+        }
+
         @media (max-width: 800px) {
             .right-panel {
-                width: 180px;
+                width: 200px;
             }
             .info-panel h3 {
                 font-size: 16px;
@@ -369,7 +375,7 @@
 
         @media (max-width: 700px) {
             .right-panel {
-                width: 160px;
+                width: 180px;
             }
             .info-panel h3 {
                 font-size: 15px;
@@ -387,7 +393,7 @@
 
         @media (max-width: 600px) {
             .right-panel {
-                width: 140px;
+                width: 160px;
             }
             .wheel-item {
                 width: 44px;
@@ -547,8 +553,103 @@
             9: { trigram: '离', point: '列缺', code: 'LU7', meridian: '肺' }
         };
 
+        // 地支
+        const dizhi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+        
+        // 六十甲子表
+        const jiazi60 = [];
+        for (let i = 0; i < 60; i++) {
+            jiazi60.push(tiangan[i % 10] + dizhi[i % 12]);
+        }
+
         let currentMethod = 'nazhi';
         let currentMinutes = 480;
+
+        // 获取日干支（基于1900-01-31为甲子的基准）
+        function getDayGanZhi(date) {
+            const baseDate = new Date(1900, 0, 31); // 1900年1月31日为甲子日
+            const diffDays = Math.floor((date - baseDate) / (1000 * 60 * 60 * 24));
+            const jiaziIndex = ((diffDays % 60) + 60) % 60;
+            return {
+                ganZhi: jiazi60[jiaziIndex],
+                gan: tiangan[jiaziIndex % 10],
+                zhi: dizhi[jiaziIndex % 12],
+                index: jiaziIndex
+            };
+        }
+
+        // 纳干法：根据日干和时辰计算五输穴
+        function getNaganXuewei(dayGan, hour) {
+            // 阳干取阳经，阴干取阴经
+            const yangGan = ['甲', '丙', '戊', '庚', '壬'];
+            const isYang = yangGan.includes(dayGan);
+            
+            const ganData = naganData[dayGan];
+            if (!ganData) return null;
+            
+            // 根据时辰确定五输穴类型
+            // 阳经：井(金)→荥(水)→输(木)→经(火)→合(土)
+            // 阴经：井(木)→荥(火)→输(土)→经(金)→合(水)
+            const shichenZhi = dizhi[hour % 12];
+            const shichenIndex = dizhi.indexOf(shichenZhi);
+            
+            // 简化算法：根据时辰地支与日的关系
+            let xueweiType, xuewei;
+            const hourMod = hour % 10;
+            
+            if (hourMod <= 1) { 
+                xueweiType = isYang ? '荥穴(水)' : '荥穴(火)'; 
+                xuewei = ganData.ying; 
+            } else if (hourMod <= 3) { 
+                xueweiType = isYang ? '输穴(木)' : '输穴(土)'; 
+                xuewei = ganData.shu; 
+            } else if (hourMod <= 5) { 
+                xueweiType = isYang ? '经穴(火)' : '经穴(金)'; 
+                xuewei = ganData.jing; 
+            } else { 
+                xueweiType = isYang ? '合穴(土)' : '合穴(水)'; 
+                xuewei = ganData.he; 
+            }
+            
+            return { xuewei, xueweiType, ganData, isYang };
+        }
+
+        // 飞腾八法：8日周期
+        function getFeitengXuewei(dayGanZhi, shichenZhi) {
+            // 飞腾八法以8日为周期
+            const dayIndex = jiazi60.indexOf(dayGanZhi) % 8;
+            const shichenIndex = dizhi.indexOf(shichenZhi);
+            
+            // 八脉交会穴对应关系
+            const feitengPoints = {
+                0: { point: '公孙', code: 'SP4', meridian: '脾', baomai: '冲脉', zhi: '申' },
+                1: { point: '内关', code: 'PC6', meridian: '心包', baomai: '阴维', zhi: '巳' },
+                2: { point: '临泣', code: 'GB41', meridian: '胆', baomai: '带脉', zhi: '寅' },
+                3: { point: '外关', code: 'TE5', meridian: '三焦', baomai: '阳维', zhi: '亥' },
+                4: { point: '列缺', code: 'LU7', meridian: '肺', baomai: '任脉', zhi: '午' },
+                5: { point: '照海', code: 'KI6', meridian: '肾', baomai: '阴跷', zhi: '未' },
+                6: { point: '后溪', code: 'SI3', meridian: '小肠', baomai: '督脉', zhi: '辰' },
+                7: { point: '申脉', code: 'BL62', meridian: '膀胱', baomai: '阳跷', zhi: '戌' }
+            };
+            
+            // 根据日干支和时辰计算当值穴位
+            const pointIndex = (dayIndex + shichenIndex) % 8;
+            return feitengPoints[pointIndex];
+        }
+
+        // 灵龟八法：60日甲子周期配合九宫八卦
+        function getLingguiXuewei(dayGanZhi, shichenZhi) {
+            const dayIndex = jiazi60.indexOf(dayGanZhi);
+            const shichenIndex = dizhi.indexOf(shichenZhi);
+            
+            // 灵龟八法计算公式：(日干支序数 + 时辰序数) % 9
+            // 如果余数为0，则取9
+            let jiugongNumber = ((dayIndex + shichenIndex) % 9);
+            if (jiugongNumber === 0) jiugongNumber = 9;
+            
+            const linggui = lingguiData[jiugongNumber];
+            return { jiugongNumber, linggui, dayIndex: dayIndex + 1 };
+        }
 
         function init() {
             createWheelItems();
@@ -644,11 +745,11 @@
         }
 
         function updateNazhiPanel(shichen) {
-            document.getElementById('infoTitle').textContent = '纳支法';
+            document.getElementById('infoTitle').textContent = '纳支法 · 12时辰周期';
             document.getElementById('infoContent').innerHTML = `
                 <div class="info-row"><span class="info-label">时辰</span><span class="info-value">${shichen.zhi}时</span></div>
                 <div class="info-row"><span class="info-label">经络</span><span class="info-value">${shichen.fullMeridian}</span></div>
-                <div class="info-row"><span class="info-label">状态</span><span class="info-value">气血最盛</span></div>
+                <div class="info-row"><span class="info-label">周期</span><span class="info-value">1日循环</span></div>
             `;
             const point = shichen.acupoints[1];
             document.getElementById('acupointCard').innerHTML = `
@@ -659,22 +760,25 @@
         }
 
         function updateNaganPanel(shichen) {
-            const dayGan = getDayGan();
-            const ganData = naganData[dayGan];
+            const now = new Date();
+            const dayGanZhi = getDayGanZhi(now);
             const hour = Math.floor(currentMinutes / 60);
-            const hourMod = hour % 10;
-            let xueweiType = '', xuewei = '';
+            const naganResult = getNaganXuewei(dayGanZhi.gan, hour);
             
-            if (hourMod <= 1) { xueweiType = '荥穴'; xuewei = ganData.ying; }
-            else if (hourMod <= 3) { xueweiType = '输穴'; xuewei = ganData.shu; }
-            else if (hourMod <= 5) { xueweiType = '经穴'; xuewei = ganData.jing; }
-            else { xueweiType = '合穴'; xuewei = ganData.he; }
+            if (!naganResult) {
+                document.getElementById('infoTitle').textContent = '纳干法';
+                document.getElementById('infoContent').innerHTML = '<div class="info-row"><span class="info-label">错误</span><span class="info-value">计算失败</span></div>';
+                return;
+            }
             
-            document.getElementById('infoTitle').textContent = '纳干法';
+            const { xuewei, xueweiType, ganData, isYang } = naganResult;
+            const dayInCycle = (dayGanZhi.index % 10) + 1;
+            
+            document.getElementById('infoTitle').textContent = '纳干法 · 10日周期';
             document.getElementById('infoContent').innerHTML = `
-                <div class="info-row"><span class="info-label">日干</span><span class="info-value">${dayGan}日</span></div>
-                <div class="info-row"><span class="info-label">经络</span><span class="info-value">${ganData.meridian}经</span></div>
-                <div class="info-row"><span class="info-label">时辰</span><span class="info-value">${shichen.zhi}时</span></div>
+                <div class="info-row"><span class="info-label">日干支</span><span class="info-value">${dayGanZhi.ganZhi}</span></div>
+                <div class="info-row"><span class="info-label">周期</span><span class="info-value">第${dayInCycle}日/10日</span></div>
+                <div class="info-row"><span class="info-label">经络</span><span class="info-value">${ganData.meridian}经${isYang ? '(阳)' : '(阴)'}</span></div>
             `;
             document.getElementById('acupointCard').innerHTML = `
                 <div class="point-name">${xuewei}</div>
@@ -684,45 +788,40 @@
         }
 
         function updateFeitengPanel(shichen) {
-            const feiteng = feitengData[shichen.zhi];
-            document.getElementById('infoTitle').textContent = '飞腾八法';
+            const now = new Date();
+            const dayGanZhi = getDayGanZhi(now);
+            const feiteng = getFeitengXuewei(dayGanZhi.ganZhi, shichen.zhi);
+            const dayInCycle = (jiazi60.indexOf(dayGanZhi.ganZhi) % 8) + 1;
             
-            if (feiteng) {
-                document.getElementById('infoContent').innerHTML = `
-                    <div class="info-row"><span class="info-label">时辰</span><span class="info-value">${shichen.zhi}时</span></div>
-                    <div class="info-row"><span class="info-label">经络</span><span class="info-value">${feiteng.meridian}经</span></div>
-                    <div class="info-row"><span class="info-label">八脉</span><span class="info-value">${feiteng.baomai}</span></div>
-                `;
-                document.getElementById('acupointCard').innerHTML = `
-                    <div class="point-name">${feiteng.point}</div>
-                    <div class="point-code">${feiteng.code}</div>
-                    <div class="point-meridian">八脉交会</div>
-                `;
-            } else {
-                document.getElementById('infoContent').innerHTML = `
-                    <div class="info-row"><span class="info-label">时辰</span><span class="info-value">${shichen.zhi}时</span></div>
-                    <div class="info-row"><span class="info-label">说明</span><span class="info-value">无主穴</span></div>
-                `;
-                document.getElementById('acupointCard').innerHTML = '<div class="point-name">-</div>';
-            }
+            document.getElementById('infoTitle').textContent = '飞腾八法 · 8日周期';
+            document.getElementById('infoContent').innerHTML = `
+                <div class="info-row"><span class="info-label">日干支</span><span class="info-value">${dayGanZhi.ganZhi}</span></div>
+                <div class="info-row"><span class="info-label">周期</span><span class="info-value">第${dayInCycle}日/8日</span></div>
+                <div class="info-row"><span class="info-label">八脉</span><span class="info-value">${feiteng.baomai}</span></div>
+            `;
+            document.getElementById('acupointCard').innerHTML = `
+                <div class="point-name">${feiteng.point}</div>
+                <div class="point-code">${feiteng.code}</div>
+                <div class="point-meridian">${feiteng.meridian}经</div>
+            `;
         }
 
         function updateLingguiPanel(shichen) {
             const now = new Date();
-            const shichenIndex = shichenData.findIndex(s => s.zhi === shichen.zhi);
-            const jiugongNumber = ((now.getDate() + shichenIndex) % 9) || 9;
-            const linggui = lingguiData[jiugongNumber];
+            const dayGanZhi = getDayGanZhi(now);
+            const lingguiResult = getLingguiXuewei(dayGanZhi.ganZhi, shichen.zhi);
+            const { jiugongNumber, linggui, dayIndex } = lingguiResult;
             
-            document.getElementById('infoTitle').textContent = '灵龟八法';
+            document.getElementById('infoTitle').textContent = '灵龟八法 · 60日周期';
             document.getElementById('infoContent').innerHTML = `
-                <div class="info-row"><span class="info-label">九宫</span><span class="info-value">${jiugongNumber}(${linggui.trigram})</span></div>
-                <div class="info-row"><span class="info-label">经络</span><span class="info-value">${linggui.meridian}经</span></div>
-                <div class="info-row"><span class="info-label">时辰</span><span class="info-value">${shichen.zhi}时</span></div>
+                <div class="info-row"><span class="info-label">日干支</span><span class="info-value">${dayGanZhi.ganZhi}</span></div>
+                <div class="info-row"><span class="info-label">周期</span><span class="info-value">第${dayIndex}日/60日</span></div>
+                <div class="info-row"><span class="info-label">九宫</span><span class="info-value">${jiugongNumber}(${linggui.trigram}卦)</span></div>
             `;
             document.getElementById('acupointCard').innerHTML = `
                 <div class="point-name">${linggui.point}</div>
                 <div class="point-code">${linggui.code}</div>
-                <div class="point-meridian">${linggui.trigram}卦</div>
+                <div class="point-meridian">${linggui.meridian}经</div>
             `;
         }
 
