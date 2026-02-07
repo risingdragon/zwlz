@@ -128,15 +128,19 @@
             font-size: 12px;
         }
 
-        .controls { margin-top: 10px; display: flex; gap: 8px; z-index: 20; }
+        .controls { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; z-index: 20; justify-content: center; align-items: center; }
         button {
-            padding: 8px 15px;
+            padding: 8px 12px;
             background: var(--accent-color);
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
+            height: 34px;
+            line-height: 18px;
+            box-sizing: border-box;
+            white-space: nowrap;
         }
         button.btn-alt { background: var(--gold-accent); }
 
@@ -174,8 +178,10 @@
     </div>
 
     <div class="controls">
-        <button onclick="resetCompass()">重置对齐</button>
         <button class="btn-alt" onclick="calculateAndAlign()">当前开穴实时查询</button>
+        <button onclick="setCondition('excess')">实症</button>
+        <button onclick="setCondition('deficiency')">虚症</button>
+        <button onclick="setCondition('normal')">不实不虚</button>
     </div>
 
     <div class="info-panel" id="info">
@@ -208,17 +214,17 @@
             { id: 'layer-0', items: ['23-1 子', '1-3 丑', '3-5 寅', '5-7 卯', '7-9 辰', '9-11 巳', '11-13 午', '13-15 未', '15-17 申', '17-19 酉', '19-21 戌', '21-23 亥'] },
             { id: 'layer-1', items: Object.values(trigramPoints).slice(0, 8) }, // 简化显示常用8穴
             { id: 'layer-2', items: [
-                {n: '胆经', p: '窍阴 侠溪 临泣 阳辅 阳陵泉'}, {n: '肝经', p: '大敦 行间 太冲 中封 曲泉'},
-                {n: '肺经', p: '少商 鱼际 太渊 经渠 尺泽'}, {n: '大肠', p: '商阳 二间 三间 阳溪 曲池'},
-                {n: '胃经', p: '厉兑 内庭 陷谷 解溪 足三里'}, {n: '脾经', p: '隐白 大都 太白 商丘 阴陵泉'},
-                {n: '心经', p: '少冲 少府 神门 灵道 少海'}, {n: '小肠', p: '少泽 前谷 后溪 阳谷 小海'},
-                {n: '膀胱', p: '至阴 通谷 束骨 昆仑 委中'}, {n: '肾经', p: '涌泉 然谷 太溪 复溜 阴谷'},
-                {n: '心包', p: '中冲 劳宫 大陵 间使 曲泽'}, {n: '三焦', p: '关冲 液门 中渚 支沟 天井'}
+                {n: '胆经', p: ['窍阴', '侠溪', '临泣', '阳辅', '阳陵泉']}, {n: '肝经', p: ['大敦', '行间', '太冲', '中封', '曲泉']},
+                {n: '肺经', p: ['少商', '鱼际', '太渊', '经渠', '尺泽']}, {n: '大肠', p: ['商阳', '二间', '三间', '阳溪', '曲池']},
+                {n: '胃经', p: ['厉兑', '内庭', '陷谷', '解溪', '足三里']}, {n: '脾经', p: ['隐白', '大都', '太白', '商丘', '阴陵泉']},
+                {n: '心经', p: ['少冲', '少府', '神门', '灵道', '少海']}, {n: '小肠', p: ['少泽', '前谷', '后溪', '阳谷', '小海']},
+                {n: '膀胱', p: ['至阴', '通谷', '束骨', '昆仑', '委中']}, {n: '肾经', p: ['涌泉', '然谷', '太溪', '复溜', '阴谷']},
+                {n: '心包', p: ['中冲', '劳宫', '大陵', '间使', '曲泽']}, {n: '三焦', p: ['关冲', '液门', '中渚', '支沟', '天井']}
             ]},
             { id: 'layer-3', items: BRANCHES }
         ];
 
-        const state = { rotations: [0, 0, 0, 0], isDragging: false, currentLayer: null, startAngle: 0, baseRotation: 0 };
+        const state = { rotations: [0, 0, 0, 0], isDragging: false, currentLayer: null, startAngle: 0, baseRotation: 0, condition: 'normal' }; // condition: excess(实症), deficiency(虚症), normal(不实不虚)
 
         // 简易日干支算法 (参考公历)
         function getGanZhi(date) {
@@ -289,7 +295,7 @@
                     if (idx === 1) {
                         label.innerHTML = `<span>${item.m}</span><span class="sub-info">${item.s}</span><span class="sub-info">${item.d}</span>`;
                     } else if (idx === 2) {
-                        label.innerHTML = `<span class="highlight">${item.n}</span><div class="points-list">${item.p}</div>`;
+                        label.innerHTML = `<span class="highlight">${item.n}</span><div class="points-list">${item.p.join(' ')}</div>`;
                     } else {
                         label.innerText = item;
                     }
@@ -332,6 +338,28 @@
 
         function resetCompass() { state.rotations = [0, 0, 0, 0]; updateUI(); }
 
+        function setCondition(condition) {
+            state.condition = condition;
+            calculateAndAlign(); // 重新计算开穴
+        }
+
+        function getSelectedPoints(organData, condition) {
+            const allPoints = organData.p;
+            switch(condition) {
+                case 'excess':
+                    // 实症：选择井穴、荥穴、输穴
+                    return allPoints.slice(0, 3);
+                case 'deficiency':
+                    // 虚症：选择输穴、经穴、合穴
+                    return allPoints.slice(2, 5);
+                case 'normal':
+                    // 不实不虚：选择荥穴、输穴、经穴
+                    return allPoints.slice(1, 4);
+                default:
+                    return allPoints;
+            }
+        }
+
         function calculateAndAlign() {
             const now = new Date();
             const gz = getGanZhi(now);
@@ -354,9 +382,25 @@
             updateUI();
 
             const organData = layersConfig[2].items[gz.hourIndex];
+            const selectedPoints = getSelectedPoints(organData, state.condition);
+            
+            let conditionText = '';
+            switch(state.condition) {
+                case 'excess':
+                    conditionText = '实症';
+                    break;
+                case 'deficiency':
+                    conditionText = '虚症';
+                    break;
+                case 'normal':
+                    conditionText = '不实不虚';
+                    break;
+            }
+
             document.getElementById('info').innerHTML = `
                 📅 <b>今日历法</b>：${gz.dayStem}${gz.dayBranch}日 ${gz.hourStem}${gz.hourBranch}时<br>
-                🩸 <b>子午流注</b>：<span class="highlight">${organData.n}</span> 气血最旺。常用五输穴：${organData.p}<br>
+                🩸 <b>子午流注</b>：<span class="highlight">${organData.n}</span> 气血最旺。
+                ${conditionText}推荐五输穴：<span class="highlight">${selectedPoints.join(' ')}</span><br>
                 🐢 <b>灵龟八法</b>：(配数和=${sum}) 属 <span class="gold-highlight">${point.d}</span> 卦。<br>
                 📍 <b>当前开穴</b>：<span class="gold-highlight">${point.m}</span> (通${point.s})。
             `;
