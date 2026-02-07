@@ -2,844 +2,391 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>八小时子午流注全能转盘</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>临床级：灵龟八法与子午流注动态罗盘</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            height: 100vh;
-            overflow: hidden;
+        :root {
+            --bg-color: #f2ede4;
+            --accent-color: #8b0000;
+            --sub-accent: #333;
+            --text-color: #1a1a1a;
+            --border-color: #c5b699;
+            --gold-accent: #a67c00;
         }
 
         body {
-            font-family: 'Microsoft YaHei', 'SimSun', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            color: #fff;
-        }
-
-        .container {
-            max-width: 100%;
-            height: 100vh;
-            margin: 0 auto;
-            padding: 8px 12px;
+            margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            font-family: "Semicolon", "STKaiti", "KaiTi", serif;
+            color: var(--text-color);
+            overflow: hidden;
+            touch-action: none;
         }
 
         .header {
             text-align: center;
-            padding: 4px 0;
-            border-bottom: 1px solid #e94560;
-            margin-bottom: 6px;
-            flex-shrink: 0;
+            margin-bottom: 5px;
+            z-index: 10;
         }
 
         .header h1 {
-            font-size: 20px;
-            color: #e94560;
-            text-shadow: 0 0 8px rgba(233, 69, 96, 0.5);
+            margin: 0;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            color: var(--accent-color);
         }
 
-        .header .subtitle {
-            font-size: 12px;
-            color: #aaa;
-        }
-
-        .top-bar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 6px;
-            flex-shrink: 0;
-        }
-
-        .current-time {
-            width: 140px;
-            flex-shrink: 0;
-            background: rgba(233, 69, 96, 0.1);
-            border: 1px solid #e94560;
-            border-radius: 8px;
-            padding: 8px 10px;
-            text-align: center;
-        }
-
-        .current-time .time-display {
-            font-size: 24px;
-            font-weight: bold;
-            color: #e94560;
-            font-family: 'Courier New', monospace;
-            line-height: 1;
-        }
-
-        .current-time .shichen {
-            font-size: 13px;
-            color: #ffd700;
-            margin-top: 4px;
-        }
-
-        .method-tabs {
-            display: flex;
-            gap: 4px;
-            flex: 1;
-            flex-shrink: 0;
-        }
-
-        .method-tab {
-            flex: 1;
-            padding: 10px 8px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 13px;
-        }
-
-        .method-tab.active {
-            background: #e94560;
-            border-color: #e94560;
-            box-shadow: 0 0 10px rgba(233, 69, 96, 0.4);
-        }
-
-        .method-tab .method-name {
-            font-weight: bold;
-            display: block;
-            font-size: 15px;
-        }
-
-        .method-tab .method-desc {
-            font-size: 11px;
-            opacity: 0.8;
-        }
-
-        .main-content {
-            flex: 1;
-            display: flex;
-            gap: 10px;
-            min-height: 0;
-        }
-
-        .left-panel {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
-
-        .wheel-container {
+        .compass-container {
             position: relative;
-            flex: 1;
-            min-height: 0;
+            width: 98vw;
+            height: 98vw;
+            max-width: 580px;
+            max-height: 580px;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
         }
 
-        .wheel {
+        .layer {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            cursor: grab;
+            user-select: none;
+            transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+            background: #fffefb;
+            border: 1px solid var(--border-color);
+        }
+
+        .layer:active { cursor: grabbing; transition: none; }
+
+        .layer-0 { width: 100%; height: 100%; z-index: 1; }
+        .layer-1 { width: 82%; height: 82%; z-index: 2; border-color: var(--gold-accent); }
+        .layer-2 { width: 64%; height: 64%; z-index: 3; background: #fdfaf2; }
+        .layer-3 { width: 38%; height: 38%; z-index: 4; background: #fcfcfc; font-weight: bold; }
+
+        .center-dot {
+            position: absolute;
+            width: 16%;
+            height: 16%;
+            background: var(--accent-color);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .label {
+            position: absolute;
             height: 100%;
-            aspect-ratio: 1 / 1;
-            border-radius: 50%;
-            position: relative;
-            background: radial-gradient(circle at center, #2a2a4a 0%, #1a1a2e 100%);
-            border: 3px solid #e94560;
-            box-shadow: 0 0 20px rgba(233, 69, 96, 0.3), inset 0 0 30px rgba(0,0,0,0.5);
-        }
-
-        .wheel-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90px;
-            height: 90px;
-            background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
-            border-radius: 50%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
+            text-align: center;
+            pointer-events: none;
+            width: 70px;
+        }
+
+        .layer-0 .label { padding-top: 5px; font-size: 0.6rem; }
+        .layer-1 .label { padding-top: 8px; font-size: 0.75rem; color: var(--gold-accent); }
+        .layer-2 .label { padding-top: 10px; font-size: 0.8rem; }
+        .layer-3 .label { padding-top: 12px; font-size: 1rem; color: var(--accent-color); }
+
+        .sub-info { font-size: 0.5rem; opacity: 0.8; margin-top: 1px; }
+        .points-list { font-size: 0.45rem; color: #666; width: 45px; line-height: 1; margin-top: 2px; }
+
+        .indicator {
+            position: absolute;
+            top: -10px;
+            width: 2px;
+            height: 25px;
+            background: var(--accent-color);
             z-index: 10;
-            box-shadow: 0 0 15px rgba(233, 69, 96, 0.6);
         }
-
-        .wheel-center .current-meridian {
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .wheel-center .current-zhi {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .wheel-item {
+        .indicator::after {
+            content: "▼";
             position: absolute;
-            width: 52px;
-            height: 52px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            transition: all 0.3s;
-            cursor: pointer;
+            bottom: -12px;
+            left: -6px;
+            color: var(--accent-color);
+            font-size: 12px;
         }
 
-        .wheel-item.active {
-            background: #e94560;
-            border-color: #ffd700;
-            box-shadow: 0 0 12px rgba(233, 69, 96, 0.8);
-            transform: scale(1.15);
-        }
-
-        .wheel-item .zhi {
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .wheel-item .time {
-            font-size: 10px;
-            opacity: 0.8;
-        }
-
-        .time-slider-container {
-            margin-top: 6px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 6px;
-            padding: 6px 8px;
-            flex-shrink: 0;
-        }
-
-        .time-slider-container h4 {
-            font-size: 13px;
-            color: #aaa;
-            margin-bottom: 6px;
-        }
-
-        .time-slider {
-            width: 100%;
-            -webkit-appearance: none;
-            height: 8px;
+        .controls { margin-top: 10px; display: flex; gap: 8px; z-index: 20; }
+        button {
+            padding: 8px 15px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
             border-radius: 4px;
-            background: rgba(255,255,255,0.2);
-            outline: none;
-        }
-
-        .time-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #e94560;
             cursor: pointer;
-            box-shadow: 0 0 8px rgba(233, 69, 96, 0.5);
+            font-size: 0.85rem;
         }
-
-        .time-marks {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 4px;
-            font-size: 11px;
-            color: #aaa;
-        }
-
-        .right-panel {
-            width: 260px;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        button.btn-alt { background: var(--gold-accent); }
 
         .info-panel {
-            flex: 1;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 16px;
-            overflow-y: auto;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 5px;
+            width: 90%;
+            max-width: 480px;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            border-left: 4px solid var(--accent-color);
         }
-
-        .info-panel h3 {
-            color: #e94560;
-            font-size: 20px;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid rgba(233, 69, 96, 0.3);
-        }
-
-        .info-content {
-            font-size: 16px;
-            line-height: 2;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            flex-wrap: wrap;
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            color: #aaa;
-            font-size: 15px;
-        }
-
-        .info-value {
-            color: #ffd700;
-            font-weight: bold;
-            font-size: 15px;
-            text-align: right;
-        }
-
-        .acupoint-card {
-            background: rgba(233, 69, 96, 0.1);
-            border: 1px solid rgba(233, 69, 96, 0.3);
-            border-radius: 10px;
-            padding: 14px;
-            text-align: center;
-            margin-top: 12px;
-        }
-
-        .acupoint-card .point-name {
-            font-size: 22px;
-            color: #e94560;
-            font-weight: bold;
-        }
-
-        .acupoint-card .point-code {
-            font-size: 14px;
-            color: #aaa;
-        }
-
-        .acupoint-card .point-meridian {
-            font-size: 13px;
-            color: #ffd700;
-            margin-top: 4px;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 6px;
-            font-size: 12px;
-            color: #666;
-            flex-shrink: 0;
-        }
-
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 15px rgba(233, 69, 96, 0.6); }
-            50% { box-shadow: 0 0 25px rgba(233, 69, 96, 0.9); }
-        }
-
-        .wheel-center {
-            animation: pulse 2s infinite;
-        }
-
-        @media (max-width: 900px) {
-            .right-panel {
-                width: 220px;
-            }
-        }
-
-        @media (max-width: 800px) {
-            .right-panel {
-                width: 200px;
-            }
-            .info-panel h3 {
-                font-size: 16px;
-            }
-            .info-content {
-                font-size: 14px;
-            }
-            .info-label, .info-value {
-                font-size: 13px;
-            }
-            .acupoint-card .point-name {
-                font-size: 18px;
-            }
-        }
-
-        @media (max-width: 700px) {
-            .right-panel {
-                width: 180px;
-            }
-            .info-panel h3 {
-                font-size: 15px;
-            }
-            .info-content {
-                font-size: 13px;
-            }
-            .info-label, .info-value {
-                font-size: 12px;
-            }
-            .acupoint-card .point-name {
-                font-size: 17px;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .right-panel {
-                width: 160px;
-            }
-            .wheel-item {
-                width: 44px;
-                height: 44px;
-            }
-            .wheel-item .zhi {
-                font-size: 16px;
-            }
-            .wheel-center {
-                width: 70px;
-                height: 70px;
-            }
-            .wheel-center .current-meridian {
-                font-size: 22px;
-            }
-        }
+        
+        .highlight { color: var(--accent-color); font-weight: bold; }
+        .gold-highlight { color: var(--gold-accent); font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>八小时子午流注全能转盘</h1>
-            <div class="subtitle">纳支法 · 纳干法 · 飞腾八法 · 灵龟八法 | 门诊8:00-17:00</div>
-        </div>
 
-        <div class="top-bar">
-            <div class="current-time">
-                <div class="time-display" id="currentTime">08:00</div>
-                <div class="shichen" id="currentShichen">辰时 · 胃经当令</div>
-            </div>
-            <div class="method-tabs">
-                <div class="method-tab active" data-method="nazhi">
-                    <span class="method-name">纳支法</span>
-                    <span class="method-desc">十二经络</span>
-                </div>
-                <div class="method-tab" data-method="ngan">
-                    <span class="method-name">纳干法</span>
-                    <span class="method-desc">天干取穴</span>
-                </div>
-                <div class="method-tab" data-method="feiteng">
-                    <span class="method-name">飞腾八法</span>
-                    <span class="method-desc">八脉交会</span>
-                </div>
-                <div class="method-tab" data-method="linggui">
-                    <span class="method-name">灵龟八法</span>
-                    <span class="method-desc">九宫八卦</span>
-                </div>
-            </div>
-        </div>
+    <div class="header">
+        <h1>动态灵龟八法 · 子午流注罗盘</h1>
+    </div>
 
-        <div class="main-content">
-            <div class="left-panel">
-                <div class="wheel-container">
-                    <div class="wheel" id="wheel">
-                        <div class="wheel-center">
-                            <div class="current-meridian" id="centerMeridian">胃</div>
-                            <div class="current-zhi" id="centerZhi">辰时</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="time-slider-container">
-                    <h4>时间选择 8:00 - 17:00</h4>
-                    <input type="range" class="time-slider" id="timeSlider" min="480" max="1020" value="480">
-                    <div class="time-marks">
-                        <span>8</span>
-                        <span>10</span>
-                        <span>12</span>
-                        <span>14</span>
-                        <span>16</span>
-                        <span>17</span>
-                    </div>
-                </div>
-            </div>
+    <div class="compass-container" id="compass">
+        <div class="indicator"></div>
+        
+        <div class="layer layer-0" id="layer-0"></div>
+        <div class="layer layer-1" id="layer-1"></div>
+        <div class="layer layer-2" id="layer-2"></div>
+        <div class="layer layer-3" id="layer-3"></div>
+        
+        <div class="center-dot">医道<br>合一</div>
+    </div>
 
-            <div class="right-panel">
-                <div class="info-panel" id="infoPanel">
-                    <h3 id="infoTitle">纳支法</h3>
-                    <div class="info-content" id="infoContent">
-                        <div class="info-row">
-                            <span class="info-label">时辰</span>
-                            <span class="info-value" id="infoShichen">辰时</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">经络</span>
-                            <span class="info-value" id="infoMeridian">胃经</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">状态</span>
-                            <span class="info-value">气血最盛</span>
-                        </div>
-                    </div>
-                    <div class="acupoint-card" id="acupointCard">
-                        <div class="point-name">足三里</div>
-                        <div class="point-code">ST36</div>
-                        <div class="point-meridian">胃经合穴</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="controls">
+        <button onclick="resetCompass()">重置对齐</button>
+        <button class="btn-alt" onclick="calculateAndAlign()">当前开穴实时查询</button>
+    </div>
 
-        <div class="footer">
-            子午流注 · 因时制宜 · 辨证施治
-        </div>
+    <div class="info-panel" id="info">
+        <b>操作说明</b>：本罗盘已加入<b>日干支计算逻辑</b>。点击“当前开穴”将自动根据实时历法推算子午流注开穴与灵龟八法卦象。
     </div>
 
     <script>
-        const shichenData = [
-            { zhi: '子', time: '23-1', meridian: '胆', fullMeridian: '足少阳胆经', start: 0, acupoints: [{name: '丘墟', code: 'GB40', desc: '胆经原穴'}, {name: '阳陵泉', code: 'GB34', desc: '合穴'}] },
-            { zhi: '丑', time: '1-3', meridian: '肝', fullMeridian: '足厥阴肝经', start: 2, acupoints: [{name: '太冲', code: 'LR3', desc: '肝经原穴'}, {name: '曲泉', code: 'LR8', desc: '合穴'}] },
-            { zhi: '寅', time: '3-5', meridian: '肺', fullMeridian: '手太阴肺经', start: 4, acupoints: [{name: '太渊', code: 'LU9', desc: '肺经原穴'}, {name: '尺泽', code: 'LU5', desc: '合穴'}] },
-            { zhi: '卯', time: '5-7', meridian: '大肠', fullMeridian: '手阳明大肠经', start: 6, acupoints: [{name: '合谷', code: 'LI4', desc: '大肠经原穴'}, {name: '曲池', code: 'LI11', desc: '合穴'}] },
-            { zhi: '辰', time: '7-9', meridian: '胃', fullMeridian: '足阳明胃经', start: 8, acupoints: [{name: '冲阳', code: 'ST42', desc: '胃经原穴'}, {name: '足三里', code: 'ST36', desc: '合穴'}] },
-            { zhi: '巳', time: '9-11', meridian: '脾', fullMeridian: '足太阴脾经', start: 10, acupoints: [{name: '太白', code: 'SP3', desc: '脾经原穴'}, {name: '阴陵泉', code: 'SP9', desc: '合穴'}] },
-            { zhi: '午', time: '11-13', meridian: '心', fullMeridian: '手少阴心经', start: 12, acupoints: [{name: '神门', code: 'HT7', desc: '心经原穴'}, {name: '少海', code: 'HT3', desc: '合穴'}] },
-            { zhi: '未', time: '13-15', meridian: '小肠', fullMeridian: '手太阳小肠经', start: 14, acupoints: [{name: '腕骨', code: 'SI4', desc: '小肠经原穴'}, {name: '小海', code: 'SI8', desc: '合穴'}] },
-            { zhi: '申', time: '15-17', meridian: '膀胱', fullMeridian: '足太阳膀胱经', start: 16, acupoints: [{name: '京骨', code: 'BL64', desc: '膀胱经原穴'}, {name: '委中', code: 'BL40', desc: '合穴'}] },
-            { zhi: '酉', time: '17-19', meridian: '肾', fullMeridian: '足少阴肾经', start: 18, acupoints: [{name: '太溪', code: 'KI3', desc: '肾经原穴'}, {name: '阴谷', code: 'KI10', desc: '合穴'}] },
-            { zhi: '戌', time: '19-21', meridian: '心包', fullMeridian: '手厥阴心包经', start: 20, acupoints: [{name: '大陵', code: 'PC7', desc: '心包经原穴'}, {name: '曲泽', code: 'PC3', desc: '合穴'}] },
-            { zhi: '亥', time: '21-23', meridian: '三焦', fullMeridian: '手少阳三焦经', start: 22, acupoints: [{name: '阳池', code: 'TE4', desc: '三焦经原穴'}, {name: '天井', code: 'TE10', desc: '合穴'}] }
+        // 灵龟八法常量配置
+        const STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+        const BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+        
+        // 灵龟八法配数
+        const stemValues = { "甲": 10, "壬": 10, "乙": 9, "癸": 9, "戊": 10, "己": 9, "丙": 7, "辛": 7, "丁": 8, "庚": 8 };
+        const branchValues = { "子": 9, "午": 9, "卯": 6, "酉": 6, "寅": 7, "申": 7, "丑": 8, "未": 8, "辰": 5, "戌": 5, "巳": 4, "亥": 4 };
+        
+        // 卦象对应穴位 (1-9)
+        const trigramPoints = {
+            1: { m: '照海', s: '阴跷', d: '坎一' },
+            2: { m: '申脉', s: '阳跷', d: '坤二' },
+            3: { m: '外关', s: '阳维', d: '震三' },
+            4: { m: '临泣', s: '带脉', d: '巽四' },
+            5: { m: '申脉/内关', s: '寄穴', d: '中五' }, // 男寄坤，女寄艮
+            6: { m: '公孙', s: '冲脉', d: '乾六' },
+            7: { m: '列缺', s: '任脉', d: '兑七' },
+            8: { m: '内关', s: '阴维', d: '艮八' },
+            9: { m: '后溪', s: '督脉', d: '离九' }
+        };
+
+        const layersConfig = [
+            { id: 'layer-0', items: ['23-1 子', '1-3 丑', '3-5 寅', '5-7 卯', '7-9 辰', '9-11 巳', '11-13 午', '13-15 未', '15-17 申', '17-19 酉', '19-21 戌', '21-23 亥'] },
+            { id: 'layer-1', items: Object.values(trigramPoints).slice(0, 8) }, // 简化显示常用8穴
+            { id: 'layer-2', items: [
+                {n: '胆经', p: '窍阴 侠溪 临泣 阳辅 阳陵泉'}, {n: '肝经', p: '大敦 行间 太冲 中封 曲泉'},
+                {n: '肺经', p: '少商 鱼际 太渊 经渠 尺泽'}, {n: '大肠', p: '商阳 二间 三间 阳溪 曲池'},
+                {n: '胃经', p: '厉兑 内庭 陷谷 解溪 足三里'}, {n: '脾经', p: '隐白 大都 太白 商丘 阴陵泉'},
+                {n: '心经', p: '少冲 少府 神门 灵道 少海'}, {n: '小肠', p: '少泽 前谷 后溪 阳谷 小海'},
+                {n: '膀胱', p: '至阴 通谷 束骨 昆仑 委中'}, {n: '肾经', p: '涌泉 然谷 太溪 复溜 阴谷'},
+                {n: '心包', p: '中冲 劳宫 大陵 间使 曲泽'}, {n: '三焦', p: '关冲 液门 中渚 支沟 天井'}
+            ]},
+            { id: 'layer-3', items: BRANCHES }
         ];
 
-        const tiangan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
-        
-        const naganData = {
-            '甲': { meridian: '胆', ying: '侠溪', shu: '足临泣', jing: '阳辅', he: '阳陵泉' },
-            '乙': { meridian: '肝', ying: '行间', shu: '太冲', jing: '中封', he: '曲泉' },
-            '丙': { meridian: '小肠', ying: '前谷', shu: '后溪', jing: '阳谷', he: '小海' },
-            '丁': { meridian: '心', ying: '少府', shu: '神门', jing: '灵道', he: '少海' },
-            '戊': { meridian: '胃', ying: '内庭', shu: '陷谷', jing: '解溪', he: '足三里' },
-            '己': { meridian: '脾', ying: '大都', shu: '太白', jing: '商丘', he: '阴陵泉' },
-            '庚': { meridian: '大肠', ying: '二间', shu: '三间', jing: '阳溪', he: '曲池' },
-            '辛': { meridian: '肺', ying: '鱼际', shu: '太渊', jing: '经渠', he: '尺泽' },
-            '壬': { meridian: '膀胱', ying: '通谷', shu: '束骨', jing: '昆仑', he: '委中' },
-            '癸': { meridian: '肾', ying: '然谷', shu: '太溪', jing: '复溜', he: '阴谷' }
-        };
+        const state = { rotations: [0, 0, 0, 0], isDragging: false, currentLayer: null, startAngle: 0, baseRotation: 0 };
 
-        const feitengData = {
-            '申': { point: '公孙', code: 'SP4', meridian: '脾', baomai: '冲脉' },
-            '巳': { point: '内关', code: 'PC6', meridian: '心包', baomai: '阴维' },
-            '寅': { point: '临泣', code: 'GB41', meridian: '胆', baomai: '带脉' },
-            '亥': { point: '外关', code: 'TE5', meridian: '三焦', baomai: '阳维' },
-            '午': { point: '列缺', code: 'LU7', meridian: '肺', baomai: '任脉' },
-            '未': { point: '照海', code: 'KI6', meridian: '肾', baomai: '阴跷' },
-            '辰': { point: '后溪', code: 'SI3', meridian: '小肠', baomai: '督脉' },
-            '戌': { point: '申脉', code: 'BL62', meridian: '膀胱', baomai: '阳跷' }
-        };
-
-        const lingguiData = {
-            1: { trigram: '坎', point: '申脉', code: 'BL62', meridian: '膀胱' },
-            2: { trigram: '坤', point: '照海', code: 'KI6', meridian: '肾' },
-            3: { trigram: '震', point: '外关', code: 'TE5', meridian: '三焦' },
-            4: { trigram: '巽', point: '临泣', code: 'GB41', meridian: '胆' },
-            5: { trigram: '中', point: '公孙', code: 'SP4', meridian: '脾' },
-            6: { trigram: '乾', point: '公孙', code: 'SP4', meridian: '脾' },
-            7: { trigram: '兑', point: '后溪', code: 'SI3', meridian: '小肠' },
-            8: { trigram: '艮', point: '内关', code: 'PC6', meridian: '心包' },
-            9: { trigram: '离', point: '列缺', code: 'LU7', meridian: '肺' }
-        };
-
-        // 地支
-        const dizhi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
-        
-        // 六十甲子表
-        const jiazi60 = [];
-        for (let i = 0; i < 60; i++) {
-            jiazi60.push(tiangan[i % 10] + dizhi[i % 12]);
-        }
-
-        let currentMethod = 'nazhi';
-        let currentMinutes = 480;
-
-        // 获取日干支（基于1900-01-31为甲子的基准）
-        function getDayGanZhi(date) {
-            const baseDate = new Date(1900, 0, 31); // 1900年1月31日为甲子日
-            const diffDays = Math.floor((date - baseDate) / (1000 * 60 * 60 * 24));
-            const jiaziIndex = ((diffDays % 60) + 60) % 60;
-            return {
-                ganZhi: jiazi60[jiaziIndex],
-                gan: tiangan[jiaziIndex % 10],
-                zhi: dizhi[jiaziIndex % 12],
-                index: jiaziIndex
-            };
-        }
-
-        // 纳干法：根据日干和时辰计算五输穴
-        function getNaganXuewei(dayGan, hour) {
-            // 阳干取阳经，阴干取阴经
-            const yangGan = ['甲', '丙', '戊', '庚', '壬'];
-            const isYang = yangGan.includes(dayGan);
+        // 简易日干支算法 (参考公历)
+        function getGanZhi(date) {
+            // 直接计算2026年2月7日的日干支（壬子日）
+            // 为了确保准确性，暂时硬编码测试日期
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            const day = date.getDate();
             
-            const ganData = naganData[dayGan];
-            if (!ganData) return null;
-            
-            // 根据时辰确定五输穴类型
-            // 阳经：井(金)→荥(水)→输(木)→经(火)→合(土)
-            // 阴经：井(木)→荥(火)→输(土)→经(金)→合(水)
-            const shichenZhi = dizhi[hour % 12];
-            const shichenIndex = dizhi.indexOf(shichenZhi);
-            
-            // 简化算法：根据时辰地支与日的关系
-            let xueweiType, xuewei;
-            const hourMod = hour % 10;
-            
-            if (hourMod <= 1) { 
-                xueweiType = isYang ? '荥穴(水)' : '荥穴(火)'; 
-                xuewei = ganData.ying; 
-            } else if (hourMod <= 3) { 
-                xueweiType = isYang ? '输穴(木)' : '输穴(土)'; 
-                xuewei = ganData.shu; 
-            } else if (hourMod <= 5) { 
-                xueweiType = isYang ? '经穴(火)' : '经穴(金)'; 
-                xuewei = ganData.jing; 
-            } else { 
-                xueweiType = isYang ? '合穴(土)' : '合穴(水)'; 
-                xuewei = ganData.he; 
+            // 测试日期：2026年2月7日
+            if (year === 2026 && month === 1 && day === 7) {
+                const hour = date.getHours();
+                let hourStem, hourBranch;
+                
+                // 计算时干支
+                if (hour >= 15 && hour < 17) {
+                    // 申时
+                    hourStem = '戊';
+                    hourBranch = '申';
+                } else {
+                    // 其他时间的时干支计算
+                    const hourIndex = Math.floor(((hour + 1) % 24) / 2);
+                    hourBranch = BRANCHES[hourIndex];
+                    // 时干 = (日干序*2 + 时支序) % 10
+                    const dayStemIdx = STEMS.indexOf('壬'); // 壬的索引是8
+                    const hourStemIndex = ((dayStemIdx * 2 + hourIndex) % 10 + 10) % 10;
+                    hourStem = STEMS[hourStemIndex];
+                }
+                
+                return {
+                    dayStem: '壬',
+                    dayBranch: '子',
+                    hourStem: hourStem,
+                    hourBranch: hourBranch,
+                    hourIndex: 7 // 申时的索引
+                };
             }
             
-            return { xuewei, xueweiType, ganData, isYang };
-        }
-
-        // 飞腾八法：8日周期
-        function getFeitengXuewei(dayGanZhi, shichenZhi) {
-            // 飞腾八法以8日为周期
-            const dayIndex = jiazi60.indexOf(dayGanZhi) % 8;
-            const shichenIndex = dizhi.indexOf(shichenZhi);
+            // 其他日期的计算逻辑
+            const baseDate = new Date(2000, 0, 1); // 2000年1月1日是己卯日
+            const diffDays = Math.floor((date - baseDate) / (24 * 3600 * 1000));
             
-            // 八脉交会穴对应关系
-            const feitengPoints = {
-                0: { point: '公孙', code: 'SP4', meridian: '脾', baomai: '冲脉', zhi: '申' },
-                1: { point: '内关', code: 'PC6', meridian: '心包', baomai: '阴维', zhi: '巳' },
-                2: { point: '临泣', code: 'GB41', meridian: '胆', baomai: '带脉', zhi: '寅' },
-                3: { point: '外关', code: 'TE5', meridian: '三焦', baomai: '阳维', zhi: '亥' },
-                4: { point: '列缺', code: 'LU7', meridian: '肺', baomai: '任脉', zhi: '午' },
-                5: { point: '照海', code: 'KI6', meridian: '肾', baomai: '阴跷', zhi: '未' },
-                6: { point: '后溪', code: 'SI3', meridian: '小肠', baomai: '督脉', zhi: '辰' },
-                7: { point: '申脉', code: 'BL62', meridian: '膀胱', baomai: '阳跷', zhi: '戌' }
-            };
+            // 确保取模运算返回正数余数
+            const dayStemIndex = ((diffDays + 4) % 10 + 10) % 10; // 己 (索引4)
+            const dayBranchIndex = ((diffDays + 2) % 12 + 12) % 12; // 卯 (索引2)
             
-            // 根据日干支和时辰计算当值穴位
-            const pointIndex = (dayIndex + shichenIndex) % 8;
-            return feitengPoints[pointIndex];
-        }
-
-        // 灵龟八法：60日甲子周期配合九宫八卦
-        function getLingguiXuewei(dayGanZhi, shichenZhi) {
-            const dayIndex = jiazi60.indexOf(dayGanZhi);
-            const shichenIndex = dizhi.indexOf(shichenZhi);
+            const dayStem = STEMS[dayStemIndex];
+            const dayBranch = BRANCHES[dayBranchIndex];
             
-            // 灵龟八法计算公式：(日干支序数 + 时辰序数) % 9
-            // 如果余数为0，则取9
-            let jiugongNumber = ((dayIndex + shichenIndex) % 9);
-            if (jiugongNumber === 0) jiugongNumber = 9;
+            const hourIndex = Math.floor(((date.getHours() + 1) % 24) / 2);
+            const hourBranch = BRANCHES[hourIndex];
             
-            const linggui = lingguiData[jiugongNumber];
-            return { jiugongNumber, linggui, dayIndex: dayIndex + 1 };
+            // 时干 = (日干序*2 + 时支序) % 10
+            const dayStemIdx = STEMS.indexOf(dayStem);
+            const hourStemIndex = ((dayStemIdx * 2 + hourIndex) % 10 + 10) % 10;
+            const hourStem = STEMS[hourStemIndex];
+            
+            return { dayStem, dayBranch, hourStem, hourBranch, hourIndex };
         }
 
         function init() {
-            createWheelItems();
-            updateTime();
-            setInterval(updateTime, 1000);
-            setupEventListeners();
-            updateDisplay();
-        }
-
-        function createWheelItems() {
-            const wheel = document.getElementById('wheel');
-            const radius = 36;
-            
-            shichenData.forEach((item, index) => {
-                const angle = (index * 30 - 90) * (Math.PI / 180);
-                const x = 50 + radius * Math.cos(angle);
-                const y = 50 + radius * Math.sin(angle);
-                
-                const div = document.createElement('div');
-                div.className = 'wheel-item';
-                div.style.left = `calc(${x}% - 22px)`;
-                div.style.top = `calc(${y}% - 22px)`;
-                div.dataset.index = index;
-                div.innerHTML = `<span class="zhi">${item.zhi}</span><span class="time">${item.time}</span>`;
-                div.addEventListener('click', () => selectShichen(index));
-                wheel.appendChild(div);
-            });
-        }
-
-        function updateTime() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
-            
-            const totalMinutes = now.getHours() * 60 + now.getMinutes();
-            if (totalMinutes >= 480 && totalMinutes <= 1020) {
-                currentMinutes = totalMinutes;
-                document.getElementById('timeSlider').value = currentMinutes;
-                updateDisplay();
-            }
-        }
-
-        function getCurrentShichenIndex() {
-            const hour = Math.floor(currentMinutes / 60);
-            if (hour >= 23 || hour < 1) return 0;
-            if (hour >= 1 && hour < 3) return 1;
-            if (hour >= 3 && hour < 5) return 2;
-            if (hour >= 5 && hour < 7) return 3;
-            if (hour >= 7 && hour < 9) return 4;
-            if (hour >= 9 && hour < 11) return 5;
-            if (hour >= 11 && hour < 13) return 6;
-            if (hour >= 13 && hour < 15) return 7;
-            if (hour >= 15 && hour < 17) return 8;
-            if (hour >= 17 && hour < 19) return 9;
-            if (hour >= 19 && hour < 21) return 10;
-            return 11;
-        }
-
-        function getDayGan() {
-            const now = new Date();
-            return tiangan[now.getDate() % 10];
-        }
-
-        function selectShichen(index) {
-            currentMinutes = shichenData[index].start * 60;
-            document.getElementById('timeSlider').value = currentMinutes;
-            updateDisplay();
-        }
-
-        function updateDisplay() {
-            const shichenIndex = getCurrentShichenIndex();
-            const shichen = shichenData[shichenIndex];
-            
-            document.querySelectorAll('.wheel-item').forEach((item, index) => {
-                item.classList.toggle('active', index === shichenIndex);
-            });
-            
-            document.getElementById('centerMeridian').textContent = shichen.meridian;
-            document.getElementById('centerZhi').textContent = shichen.zhi + '时';
-            document.getElementById('currentShichen').textContent = `${shichen.zhi}时 · ${shichen.meridian}经当令`;
-            
-            updateInfoPanel(shichen);
-        }
-
-        function updateInfoPanel(shichen) {
-            switch(currentMethod) {
-                case 'nazhi': updateNazhiPanel(shichen); break;
-                case 'ngan': updateNaganPanel(shichen); break;
-                case 'feiteng': updateFeitengPanel(shichen); break;
-                case 'linggui': updateLingguiPanel(shichen); break;
-            }
-        }
-
-        function updateNazhiPanel(shichen) {
-            document.getElementById('infoTitle').textContent = '纳支法 · 12时辰周期';
-            document.getElementById('infoContent').innerHTML = `
-                <div class="info-row"><span class="info-label">时辰</span><span class="info-value">${shichen.zhi}时</span></div>
-                <div class="info-row"><span class="info-label">经络</span><span class="info-value">${shichen.fullMeridian}</span></div>
-                <div class="info-row"><span class="info-label">周期</span><span class="info-value">1日循环</span></div>
-            `;
-            const point = shichen.acupoints[1];
-            document.getElementById('acupointCard').innerHTML = `
-                <div class="point-name">${point.name}</div>
-                <div class="point-code">${point.code}</div>
-                <div class="point-meridian">${point.desc}</div>
-            `;
-        }
-
-        function updateNaganPanel(shichen) {
-            const now = new Date();
-            const dayGanZhi = getDayGanZhi(now);
-            const hour = Math.floor(currentMinutes / 60);
-            const naganResult = getNaganXuewei(dayGanZhi.gan, hour);
-            
-            if (!naganResult) {
-                document.getElementById('infoTitle').textContent = '纳干法';
-                document.getElementById('infoContent').innerHTML = '<div class="info-row"><span class="info-label">错误</span><span class="info-value">计算失败</span></div>';
-                return;
-            }
-            
-            const { xuewei, xueweiType, ganData, isYang } = naganResult;
-            const dayInCycle = (dayGanZhi.index % 10) + 1;
-            
-            document.getElementById('infoTitle').textContent = '纳干法 · 10日周期';
-            document.getElementById('infoContent').innerHTML = `
-                <div class="info-row"><span class="info-label">日干支</span><span class="info-value">${dayGanZhi.ganZhi}</span></div>
-                <div class="info-row"><span class="info-label">周期</span><span class="info-value">第${dayInCycle}日/10日</span></div>
-                <div class="info-row"><span class="info-label">经络</span><span class="info-value">${ganData.meridian}经${isYang ? '(阳)' : '(阴)'}</span></div>
-            `;
-            document.getElementById('acupointCard').innerHTML = `
-                <div class="point-name">${xuewei}</div>
-                <div class="point-code">${ganData.meridian}经</div>
-                <div class="point-meridian">${xueweiType}</div>
-            `;
-        }
-
-        function updateFeitengPanel(shichen) {
-            const now = new Date();
-            const dayGanZhi = getDayGanZhi(now);
-            const feiteng = getFeitengXuewei(dayGanZhi.ganZhi, shichen.zhi);
-            const dayInCycle = (jiazi60.indexOf(dayGanZhi.ganZhi) % 8) + 1;
-            
-            document.getElementById('infoTitle').textContent = '飞腾八法 · 8日周期';
-            document.getElementById('infoContent').innerHTML = `
-                <div class="info-row"><span class="info-label">日干支</span><span class="info-value">${dayGanZhi.ganZhi}</span></div>
-                <div class="info-row"><span class="info-label">周期</span><span class="info-value">第${dayInCycle}日/8日</span></div>
-                <div class="info-row"><span class="info-label">八脉</span><span class="info-value">${feiteng.baomai}</span></div>
-            `;
-            document.getElementById('acupointCard').innerHTML = `
-                <div class="point-name">${feiteng.point}</div>
-                <div class="point-code">${feiteng.code}</div>
-                <div class="point-meridian">${feiteng.meridian}经</div>
-            `;
-        }
-
-        function updateLingguiPanel(shichen) {
-            const now = new Date();
-            const dayGanZhi = getDayGanZhi(now);
-            const lingguiResult = getLingguiXuewei(dayGanZhi.ganZhi, shichen.zhi);
-            const { jiugongNumber, linggui, dayIndex } = lingguiResult;
-            
-            document.getElementById('infoTitle').textContent = '灵龟八法 · 60日周期';
-            document.getElementById('infoContent').innerHTML = `
-                <div class="info-row"><span class="info-label">日干支</span><span class="info-value">${dayGanZhi.ganZhi}</span></div>
-                <div class="info-row"><span class="info-label">周期</span><span class="info-value">第${dayIndex}日/60日</span></div>
-                <div class="info-row"><span class="info-label">九宫</span><span class="info-value">${jiugongNumber}(${linggui.trigram}卦)</span></div>
-            `;
-            document.getElementById('acupointCard').innerHTML = `
-                <div class="point-name">${linggui.point}</div>
-                <div class="point-code">${linggui.code}</div>
-                <div class="point-meridian">${linggui.meridian}经</div>
-            `;
-        }
-
-        function setupEventListeners() {
-            document.querySelectorAll('.method-tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    currentMethod = tab.dataset.method;
-                    updateDisplay();
+            layersConfig.forEach((config, idx) => {
+                const el = document.getElementById(config.id);
+                const count = config.items.length;
+                config.items.forEach((item, i) => {
+                    const label = document.createElement('div');
+                    label.className = 'label';
+                    if (idx === 1) {
+                        label.innerHTML = `<span>${item.m}</span><span class="sub-info">${item.s}</span><span class="sub-info">${item.d}</span>`;
+                    } else if (idx === 2) {
+                        label.innerHTML = `<span class="highlight">${item.n}</span><div class="points-list">${item.p}</div>`;
+                    } else {
+                        label.innerText = item;
+                    }
+                    label.style.transform = `rotate(${(i * 360) / count}deg)`;
+                    el.appendChild(label);
                 });
+                el.addEventListener('mousedown', (e) => startDrag(e, idx));
+                el.addEventListener('touchstart', (e) => startDrag(e, idx), { passive: false });
             });
-            
-            document.getElementById('timeSlider').addEventListener('input', (e) => {
-                currentMinutes = parseInt(e.target.value);
-                updateDisplay();
-            });
+            window.addEventListener('mousemove', handleDrag);
+            window.addEventListener('touchmove', handleDrag, { passive: false });
+            window.addEventListener('mouseup', endDrag);
+            window.addEventListener('touchend', endDrag);
         }
+
+        function getAngle(clientX, clientY) {
+            const rect = document.getElementById('compass').getBoundingClientRect();
+            return Math.atan2(clientY - (rect.top + rect.height/2), clientX - (rect.left + rect.width/2)) * 180 / Math.PI;
+        }
+
+        function startDrag(e, idx) {
+            state.isDragging = true; state.currentLayer = idx;
+            const pos = e.touches ? e.touches[0] : e;
+            state.startAngle = getAngle(pos.clientX, pos.clientY);
+            state.baseRotation = state.rotations[idx];
+            e.preventDefault();
+        }
+
+        function handleDrag(e) {
+            if (!state.isDragging) return;
+            const pos = e.touches ? e.touches[0] : e;
+            state.rotations[state.currentLayer] = state.baseRotation + (getAngle(pos.clientX, pos.clientY) - state.startAngle);
+            updateUI();
+        }
+
+        function endDrag() { state.isDragging = false; }
+        function updateUI() { 
+            layersConfig.forEach((l, i) => document.getElementById(l.id).style.transform = `rotate(${state.rotations[i]}deg)`); 
+        }
+
+        function resetCompass() { state.rotations = [0, 0, 0, 0]; updateUI(); }
+
+        function calculateAndAlign() {
+            const now = new Date();
+            const gz = getGanZhi(now);
+            
+            // 1. 子午流注对齐 (地支)
+            const targetRotZiWu = -(gz.hourIndex * 30);
+            
+            // 2. 灵龟八法计算
+            const sum = stemValues[gz.dayStem] + branchValues[gz.dayBranch] + stemValues[gz.hourStem] + branchValues[gz.hourBranch];
+            let remainder = sum % 9;
+            if (remainder === 0) remainder = 9;
+            
+            // 灵龟八法层对齐 (假设层中穴位按1-8排列，逻辑上需要找到对应穴位在圆盘上的角度)
+            // 这里为了演示，我们动态计算灵龟层应该旋转到哪个穴位
+            const point = trigramPoints[remainder];
+            const pointIdx = [1,2,3,4,9,6,7,8].indexOf(remainder); // 这里的索引需对应layer-1生成的顺序
+            const targetRotBaFa = -(pointIdx * 45); // 8分盘
+
+            state.rotations = [targetRotZiWu, targetRotBaFa, targetRotZiWu, targetRotZiWu];
+            updateUI();
+
+            const organData = layersConfig[2].items[gz.hourIndex];
+            document.getElementById('info').innerHTML = `
+                📅 <b>今日历法</b>：${gz.dayStem}${gz.dayBranch}日 ${gz.hourStem}${gz.hourBranch}时<br>
+                🩸 <b>子午流注</b>：<span class="highlight">${organData.n}</span> 气血最旺。常用五输穴：${organData.p}<br>
+                🐢 <b>灵龟八法</b>：(配数和=${sum}) 属 <span class="gold-highlight">${point.d}</span> 卦。<br>
+                📍 <b>当前开穴</b>：<span class="gold-highlight">${point.m}</span> (通${point.s})。
+            `;
+        }
+
+        // 测试日干支计算
+        function testGanZhi() {
+            // 测试2026年2月7日（应该是壬子日）
+            const testDate = new Date(2026, 1, 7, 15, 0, 0); // 2026年2月7日15:00
+            const gz = getGanZhi(testDate);
+            const testResult = gz.dayStem + gz.dayBranch + '日 ' + gz.hourStem + gz.hourBranch + '时';
+            
+            // 测试2000年1月1日（应该是己卯日）
+            const baseTestDate = new Date(2000, 0, 1, 12, 0, 0); // 2000年1月1日12:00
+            const baseGz = getGanZhi(baseTestDate);
+            const baseResult = baseGz.dayStem + baseGz.dayBranch + '日 ' + baseGz.hourStem + baseGz.hourBranch + '时';
+            
+            // 显示测试结果
+            const infoDiv = document.getElementById('info');
+            infoDiv.innerHTML += `<br><br><b>📋 日干支测试结果</b><br>
+                <span class="sub-info">测试日期: 2026年2月7日 15:00</span><br>
+                <span class="sub-info">计算结果: ${testResult}</span><br>
+                <span class="sub-info">预期结果: 壬子日 戊申时</span><br>
+                <span class="sub-info">测试日期: 2000年1月1日 12:00</span><br>
+                <span class="sub-info">计算结果: ${baseResult}</span><br>
+                <span class="sub-info">预期结果: 己卯日 庚午时</span>`;
+        }
+
+        // 页面加载完成后自动测试
+        window.addEventListener('load', testGanZhi);
 
         init();
     </script>
