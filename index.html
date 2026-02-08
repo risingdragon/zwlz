@@ -447,32 +447,6 @@
             `;
         }
 
-        // 测试日干支计算
-        function testGanZhi() {
-            // 测试2026年2月7日（应该是壬子日）
-            const testDate = new Date(2026, 1, 7, 15, 0, 0); // 2026年2月7日15:00
-            const gz = getGanZhi(testDate);
-            const testResult = gz.dayStem + gz.dayBranch + '日 ' + gz.hourStem + gz.hourBranch + '时';
-            
-            // 测试2000年1月1日（应该是己卯日）
-            const baseTestDate = new Date(2000, 0, 1, 12, 0, 0); // 2000年1月1日12:00
-            const baseGz = getGanZhi(baseTestDate);
-            const baseResult = baseGz.dayStem + baseGz.dayBranch + '日 ' + baseGz.hourStem + baseGz.hourBranch + '时';
-            
-            // 显示测试结果
-            const infoDiv = document.getElementById('info');
-            infoDiv.innerHTML += `<br><br><b>📋 日干支测试结果</b><br>
-                <span class="sub-info">测试日期: 2026年2月7日 15:00</span><br>
-                <span class="sub-info">计算结果: ${testResult}</span><br>
-                <span class="sub-info">预期结果: 壬子日 戊申时</span><br>
-                <span class="sub-info">测试日期: 2000年1月1日 12:00</span><br>
-                <span class="sub-info">计算结果: ${baseResult}</span><br>
-                <span class="sub-info">预期结果: 己卯日 庚午时</span>`;
-        }
-
-        // 页面加载完成后自动测试
-        window.addEventListener('load', testGanZhi);
-
         init();
     </script>
 </body>
