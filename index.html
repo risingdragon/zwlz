@@ -210,9 +210,19 @@
             9: { m: '后溪', s: '督脉', d: '离九' }
         };
 
-        // 飞腾八法配数（与灵龟八法不同）
-        const feitengStemValues = { "甲": 9, "乙": 8, "丙": 7, "丁": 6, "戊": 5, "己": 9, "庚": 8, "辛": 7, "壬": 6, "癸": 5 };
-        const feitengBranchValues = { "子": 9, "丑": 8, "寅": 7, "卯": 6, "辰": 5, "巳": 4, "午": 9, "未": 8, "申": 7, "酉": 6, "戌": 5, "亥": 4 };
+        // 飞腾八法 - 直接用时干决定开穴
+        const feitengPoints = {
+            "甲": { m: '公孙', s: '冲脉', d: '乾六' },
+            "乙": { m: '申脉', s: '阳跷', d: '坤二' },
+            "丙": { m: '内关', s: '阴维', d: '艮八' },
+            "丁": { m: '照海', s: '阴跷', d: '坎一' },
+            "戊": { m: '临泣', s: '带脉', d: '巽四' },
+            "己": { m: '列缺', s: '任脉', d: '兑七' },
+            "庚": { m: '外关', s: '阳维', d: '震三' },
+            "辛": { m: '后溪', s: '督脉', d: '离九' },
+            "壬": { m: '公孙', s: '冲脉', d: '乾六' },
+            "癸": { m: '申脉', s: '阳跷', d: '坤二' }
+        };
 
         // 纳甲法 - 日干对应的开穴
         const naJiaPoints = {
@@ -393,11 +403,8 @@
             const pointIdx = [1,2,3,4,9,6,7,8].indexOf(lingguiRemainder);
             const targetRotBaFa = -(pointIdx * 45);
 
-            // 3. 飞腾八法计算
-            const feitengSum = feitengStemValues[gz.dayStem] + feitengBranchValues[gz.dayBranch] + feitengStemValues[gz.hourStem] + feitengBranchValues[gz.hourBranch];
-            let feitengRemainder = feitengSum % 9;
-            if (feitengRemainder === 0) feitengRemainder = 9;
-            const feitengPoint = trigramPoints[feitengRemainder];
+            // 3. 飞腾八法计算 - 直接用时干决定
+            const feitengPoint = feitengPoints[gz.hourStem];
 
             state.rotations = [targetRotZiWu, targetRotBaFa, targetRotZiWu, targetRotZiWu];
             updateUI();
@@ -441,7 +448,7 @@
                 </div>
                 
                 <div style="padding: 8px; background: rgba(0,0,139,0.1); border-radius: 4px;">
-                    <b>🦅 飞腾八法</b> (配数和=${feitengSum})<br>
+                    <b>🦅 飞腾八法</b> (时干=${gz.hourStem})<br>
                     属 <span class="gold-highlight">${feitengPoint.d}</span> 卦，开 <span class="gold-highlight">${feitengPoint.m}</span> (通${feitengPoint.s})
                 </div>
             `;
