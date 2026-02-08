@@ -16,41 +16,46 @@
 
         body {
             margin: 0;
-            padding: 0;
+            padding: 10px 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             min-height: 100vh;
+            min-height: 100dvh;
             background-color: var(--bg-color);
             font-family: "Semicolon", "STKaiti", "KaiTi", serif;
             color: var(--text-color);
-            overflow: hidden;
-            touch-action: none;
+            overflow-y: auto;
+            overflow-x: hidden;
+            touch-action: pan-y;
+            box-sizing: border-box;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 5px;
+            margin: 5px 0;
             z-index: 10;
+            flex-shrink: 0;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 1.4rem;
+            font-size: clamp(1rem, 4vw, 1.4rem);
             letter-spacing: 2px;
             color: var(--accent-color);
         }
 
         .compass-container {
             position: relative;
-            width: 98vw;
-            height: 98vw;
-            max-width: 580px;
-            max-height: 580px;
+            width: min(92vw, 55vh);
+            height: min(92vw, 55vh);
+            max-width: 480px;
+            max-height: 480px;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
 
         .layer {
@@ -128,16 +133,16 @@
             font-size: 12px;
         }
 
-        .controls { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; z-index: 20; justify-content: center; align-items: center; }
+        .controls { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; z-index: 20; justify-content: center; align-items: center; flex-shrink: 0; }
         button {
-            padding: 8px 12px;
+            padding: 6px 10px;
             background: var(--accent-color);
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.8rem;
-            height: 34px;
+            font-size: 0.75rem;
+            height: 30px;
             line-height: 18px;
             box-sizing: border-box;
             white-space: nowrap;
@@ -145,8 +150,9 @@
         button.btn-alt { background: var(--gold-accent); }
 
         .info-panel {
-            margin-top: 10px;
-            padding: 10px;
+            margin-top: 8px;
+            padding: 8px;
+            flex-shrink: 0;
             background: rgba(255,255,255,0.9);
             border-radius: 5px;
             width: 90%;
@@ -429,25 +435,25 @@
             }
 
             document.getElementById('info').innerHTML = `
-                <div style="margin-bottom: 8px;">📅 <b>今日历法</b>：${gz.dayStem}${gz.dayBranch}日 ${gz.hourStem}${gz.hourBranch}时</div>
+                <div style="margin-bottom: 6px; font-size: 0.9rem;">📅 <b>今日历法</b>：${gz.dayStem}${gz.dayBranch}日 ${gz.hourStem}${gz.hourBranch}时</div>
                 
-                <div style="margin-bottom: 8px; padding: 8px; background: rgba(139,0,0,0.1); border-radius: 4px;">
+                <div style="margin-bottom: 6px; padding: 6px; background: rgba(139,0,0,0.1); border-radius: 4px; font-size: 0.85rem;">
                     <b>🩸 子午流注 - 地支选穴</b><br>
-                    <span class="highlight">${organData.n}</span> 气血最旺<br>
+                    <span class="highlight">${organData.n}</span> 气血最旺
                     ${conditionText}推荐：<span class="highlight">${selectedPoints.join(' ')}</span>
                 </div>
                 
-                <div style="margin-bottom: 8px; padding: 8px; background: rgba(166,124,0,0.1); border-radius: 4px;">
+                <div style="margin-bottom: 6px; padding: 6px; background: rgba(166,124,0,0.1); border-radius: 4px; font-size: 0.85rem;">
                     <b>🩸 子午流注 - 纳甲法</b><br>
                     日干 ${gz.dayStem} 对应：<span class="highlight">${naJia.shu} ${naJia.jing} ${naJia.he}</span>
                 </div>
                 
-                <div style="margin-bottom: 8px; padding: 8px; background: rgba(0,100,0,0.1); border-radius: 4px;">
+                <div style="margin-bottom: 6px; padding: 6px; background: rgba(0,100,0,0.1); border-radius: 4px; font-size: 0.85rem;">
                     <b>🐢 灵龟八法</b> (配数和=${lingguiSum})<br>
                     属 <span class="gold-highlight">${lingguiPoint.d}</span> 卦，开 <span class="gold-highlight">${lingguiPoint.m}</span> (通${lingguiPoint.s})
                 </div>
                 
-                <div style="padding: 8px; background: rgba(0,0,139,0.1); border-radius: 4px;">
+                <div style="padding: 6px; background: rgba(0,0,139,0.1); border-radius: 4px; font-size: 0.85rem;">
                     <b>🦅 飞腾八法</b> (时干=${gz.hourStem})<br>
                     属 <span class="gold-highlight">${feitengPoint.d}</span> 卦，开 <span class="gold-highlight">${feitengPoint.m}</span> (通${feitengPoint.s})
                 </div>
