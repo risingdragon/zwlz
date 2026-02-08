@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>临床级：灵龟八法与子午流注动态罗盘</title>
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.6/lunar.min.js"></script>
     <style>
         :root {
             --bg-color: #f2ede4;
@@ -260,60 +261,26 @@
 
         const state = { rotations: [0, 0, 0, 0], isDragging: false, currentLayer: null, startAngle: 0, baseRotation: 0, condition: 'normal' }; // condition: excess(实症), deficiency(虚症), normal(不实不虚)
 
-        // 简易日干支算法 (参考公历)
+        // 日干支计算算法 - 使用 lunar-javascript 库
         function getGanZhi(date) {
-            // 直接计算2026年2月7日的日干支（壬子日）
-            // 为了确保准确性，暂时硬编码测试日期
             const year = date.getFullYear();
-            const month = date.getMonth();
+            const month = date.getMonth() + 1; // 转换为1-12月
             const day = date.getDate();
+            const hour = date.getHours();
             
-            // 测试日期：2026年2月7日
-            if (year === 2026 && month === 1 && day === 7) {
-                const hour = date.getHours();
-                let hourStem, hourBranch;
-                
-                // 计算时干支
-                if (hour >= 15 && hour < 17) {
-                    // 申时
-                    hourStem = '戊';
-                    hourBranch = '申';
-                } else {
-                    // 其他时间的时干支计算
-                    const hourIndex = Math.floor(((hour + 1) % 24) / 2);
-                    hourBranch = BRANCHES[hourIndex];
-                    // 时干 = (日干序*2 + 时支序) % 10
-                    const dayStemIdx = STEMS.indexOf('壬'); // 壬的索引是8
-                    const hourStemIndex = ((dayStemIdx * 2 + hourIndex) % 10 + 10) % 10;
-                    hourStem = STEMS[hourStemIndex];
-                }
-                
-                return {
-                    dayStem: '壬',
-                    dayBranch: '子',
-                    hourStem: hourStem,
-                    hourBranch: hourBranch,
-                    hourIndex: 7 // 申时的索引
-                };
-            }
+            // 使用 lunar-javascript 库计算日干支
+            const lunar = Lunar.fromDate(date);
+            const dayGanZhi = lunar.getDayInGanZhi();
+            const dayStem = dayGanZhi.substring(0, 1);
+            const dayBranch = dayGanZhi.substring(1, 2);
             
-            // 其他日期的计算逻辑
-            const baseDate = new Date(2000, 0, 1); // 2000年1月1日是己卯日
-            const diffDays = Math.floor((date - baseDate) / (24 * 3600 * 1000));
-            
-            // 确保取模运算返回正数余数
-            const dayStemIndex = ((diffDays + 4) % 10 + 10) % 10; // 己 (索引4)
-            const dayBranchIndex = ((diffDays + 2) % 12 + 12) % 12; // 卯 (索引2)
-            
-            const dayStem = STEMS[dayStemIndex];
-            const dayBranch = BRANCHES[dayBranchIndex];
-            
-            const hourIndex = Math.floor(((date.getHours() + 1) % 24) / 2);
+            // 计算时干支
+            const hourIndex = Math.floor(((hour + 1) % 24) / 2);
             const hourBranch = BRANCHES[hourIndex];
             
             // 时干 = (日干序*2 + 时支序) % 10
-            const dayStemIdx = STEMS.indexOf(dayStem);
-            const hourStemIndex = ((dayStemIdx * 2 + hourIndex) % 10 + 10) % 10;
+            const dayStemIndex = STEMS.indexOf(dayStem);
+            const hourStemIndex = ((dayStemIndex * 2 + hourIndex) % 10 + 10) % 10;
             const hourStem = STEMS[hourStemIndex];
             
             return { dayStem, dayBranch, hourStem, hourBranch, hourIndex };
