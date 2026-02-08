@@ -197,7 +197,7 @@
         const stemValues = { "甲": 10, "壬": 10, "乙": 9, "癸": 9, "戊": 10, "己": 9, "丙": 7, "辛": 7, "丁": 8, "庚": 8 };
         const branchValues = { "子": 9, "午": 9, "卯": 6, "酉": 6, "寅": 7, "申": 7, "丑": 8, "未": 8, "辰": 5, "戌": 5, "巳": 4, "亥": 4 };
         
-        // 卦象对应穴位 (1-9)
+        // 卦象对应穴位 (1-9) - 灵龟八法
         const trigramPoints = {
             1: { m: '照海', s: '阴跷', d: '坎一' },
             2: { m: '申脉', s: '阳跷', d: '坤二' },
@@ -208,6 +208,24 @@
             7: { m: '列缺', s: '任脉', d: '兑七' },
             8: { m: '内关', s: '阴维', d: '艮八' },
             9: { m: '后溪', s: '督脉', d: '离九' }
+        };
+
+        // 飞腾八法配数（与灵龟八法不同）
+        const feitengStemValues = { "甲": 9, "乙": 8, "丙": 7, "丁": 6, "戊": 5, "己": 9, "庚": 8, "辛": 7, "壬": 6, "癸": 5 };
+        const feitengBranchValues = { "子": 9, "丑": 8, "寅": 7, "卯": 6, "辰": 5, "巳": 4, "午": 9, "未": 8, "申": 7, "酉": 6, "戌": 5, "亥": 4 };
+
+        // 纳甲法 - 日干对应的开穴
+        const naJiaPoints = {
+            "甲": { shu: '窍阴', jing: '阳辅', he: '阳陵泉' },
+            "乙": { shu: '大敦', jing: '中封', he: '曲泉' },
+            "丙": { shu: '少泽', jing: '阳谷', he: '小海' },
+            "丁": { shu: '少冲', jing: '灵道', he: '少海' },
+            "戊": { shu: '厉兑', jing: '解溪', he: '足三里' },
+            "己": { shu: '隐白', jing: '商丘', he: '阴陵泉' },
+            "庚": { shu: '商阳', jing: '阳溪', he: '曲池' },
+            "辛": { shu: '少商', jing: '经渠', he: '尺泽' },
+            "壬": { shu: '至阴', jing: '昆仑', he: '委中' },
+            "癸": { shu: '涌泉', jing: '复溜', he: '阴谷' }
         };
 
         const layersConfig = [
@@ -368,21 +386,27 @@
             const targetRotZiWu = -(gz.hourIndex * 30);
             
             // 2. 灵龟八法计算
-            const sum = stemValues[gz.dayStem] + branchValues[gz.dayBranch] + stemValues[gz.hourStem] + branchValues[gz.hourBranch];
-            let remainder = sum % 9;
-            if (remainder === 0) remainder = 9;
-            
-            // 灵龟八法层对齐 (假设层中穴位按1-8排列，逻辑上需要找到对应穴位在圆盘上的角度)
-            // 这里为了演示，我们动态计算灵龟层应该旋转到哪个穴位
-            const point = trigramPoints[remainder];
-            const pointIdx = [1,2,3,4,9,6,7,8].indexOf(remainder); // 这里的索引需对应layer-1生成的顺序
-            const targetRotBaFa = -(pointIdx * 45); // 8分盘
+            const lingguiSum = stemValues[gz.dayStem] + branchValues[gz.dayBranch] + stemValues[gz.hourStem] + branchValues[gz.hourBranch];
+            let lingguiRemainder = lingguiSum % 9;
+            if (lingguiRemainder === 0) lingguiRemainder = 9;
+            const lingguiPoint = trigramPoints[lingguiRemainder];
+            const pointIdx = [1,2,3,4,9,6,7,8].indexOf(lingguiRemainder);
+            const targetRotBaFa = -(pointIdx * 45);
+
+            // 3. 飞腾八法计算
+            const feitengSum = feitengStemValues[gz.dayStem] + feitengBranchValues[gz.dayBranch] + feitengStemValues[gz.hourStem] + feitengBranchValues[gz.hourBranch];
+            let feitengRemainder = feitengSum % 9;
+            if (feitengRemainder === 0) feitengRemainder = 9;
+            const feitengPoint = trigramPoints[feitengRemainder];
 
             state.rotations = [targetRotZiWu, targetRotBaFa, targetRotZiWu, targetRotZiWu];
             updateUI();
 
             const organData = layersConfig[2].items[gz.hourIndex];
             const selectedPoints = getSelectedPoints(organData, state.condition);
+            
+            // 纳甲法开穴
+            const naJia = naJiaPoints[gz.dayStem];
             
             let conditionText = '';
             switch(state.condition) {
@@ -398,11 +422,28 @@
             }
 
             document.getElementById('info').innerHTML = `
-                📅 <b>今日历法</b>：${gz.dayStem}${gz.dayBranch}日 ${gz.hourStem}${gz.hourBranch}时<br>
-                🩸 <b>子午流注</b>：<span class="highlight">${organData.n}</span> 气血最旺。
-                ${conditionText}推荐五输穴：<span class="highlight">${selectedPoints.join(' ')}</span><br>
-                🐢 <b>灵龟八法</b>：(配数和=${sum}) 属 <span class="gold-highlight">${point.d}</span> 卦。<br>
-                📍 <b>当前开穴</b>：<span class="gold-highlight">${point.m}</span> (通${point.s})。
+                <div style="margin-bottom: 8px;">📅 <b>今日历法</b>：${gz.dayStem}${gz.dayBranch}日 ${gz.hourStem}${gz.hourBranch}时</div>
+                
+                <div style="margin-bottom: 8px; padding: 8px; background: rgba(139,0,0,0.1); border-radius: 4px;">
+                    <b>🩸 子午流注 - 地支选穴</b><br>
+                    <span class="highlight">${organData.n}</span> 气血最旺<br>
+                    ${conditionText}推荐：<span class="highlight">${selectedPoints.join(' ')}</span>
+                </div>
+                
+                <div style="margin-bottom: 8px; padding: 8px; background: rgba(166,124,0,0.1); border-radius: 4px;">
+                    <b>🩸 子午流注 - 纳甲法</b><br>
+                    日干 ${gz.dayStem} 对应：<span class="highlight">${naJia.shu} ${naJia.jing} ${naJia.he}</span>
+                </div>
+                
+                <div style="margin-bottom: 8px; padding: 8px; background: rgba(0,100,0,0.1); border-radius: 4px;">
+                    <b>🐢 灵龟八法</b> (配数和=${lingguiSum})<br>
+                    属 <span class="gold-highlight">${lingguiPoint.d}</span> 卦，开 <span class="gold-highlight">${lingguiPoint.m}</span> (通${lingguiPoint.s})
+                </div>
+                
+                <div style="padding: 8px; background: rgba(0,0,139,0.1); border-radius: 4px;">
+                    <b>🦅 飞腾八法</b> (配数和=${feitengSum})<br>
+                    属 <span class="gold-highlight">${feitengPoint.d}</span> 卦，开 <span class="gold-highlight">${feitengPoint.m}</span> (通${feitengPoint.s})
+                </div>
             `;
         }
 
