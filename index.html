@@ -201,8 +201,13 @@
         const BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
         
         // 灵龟八法配数
-        const stemValues = { "甲": 10, "壬": 10, "乙": 9, "癸": 9, "戊": 10, "己": 9, "丙": 7, "辛": 7, "丁": 8, "庚": 8 };
-        const branchValues = { "子": 9, "午": 9, "卯": 6, "酉": 6, "寅": 7, "申": 7, "丑": 8, "未": 8, "辰": 5, "戌": 5, "巳": 4, "亥": 4 };
+        // 逐日干支配数（八法逐日干支歌）
+        const dayStemValues = { "甲": 10, "己": 10, "乙": 9, "庚": 9, "丁": 8, "壬": 8, "戊": 7, "癸": 7, "丙": 7, "辛": 7 };
+        const dayBranchValues = { "辰": 10, "戌": 10, "丑": 10, "未": 10, "申": 9, "酉": 9, "寅": 8, "卯": 8, "巳": 7, "午": 7, "亥": 7, "子": 7 };
+        
+        // 临时干支配数（八法临时干支歌）
+        const hourStemValues = { "甲": 9, "己": 9, "乙": 8, "庚": 8, "丙": 7, "辛": 7, "丁": 6, "壬": 6, "戊": 5, "癸": 5 };
+        const hourBranchValues = { "子": 9, "午": 9, "丑": 8, "未": 8, "寅": 7, "申": 7, "卯": 6, "酉": 6, "辰": 5, "戌": 5, "巳": 4, "亥": 4 };
         
         // 卦象对应穴位 (1-9) - 灵龟八法
         const trigramPoints = {
@@ -369,7 +374,8 @@
             const targetRotZiWu = -(gz.hourIndex * 30);
             
             // 2. 灵龟八法计算
-            const lingguiSum = stemValues[gz.dayStem] + branchValues[gz.dayBranch] + stemValues[gz.hourStem] + branchValues[gz.hourBranch];
+            // 使用逐日干支配数和临时干支配数
+            const lingguiSum = dayStemValues[gz.dayStem] + dayBranchValues[gz.dayBranch] + hourStemValues[gz.hourStem] + hourBranchValues[gz.hourBranch];
             let lingguiRemainder = lingguiSum % 9;
             if (lingguiRemainder === 0) lingguiRemainder = 9;
             const lingguiPoint = trigramPoints[lingguiRemainder];
