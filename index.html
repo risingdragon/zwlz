@@ -191,6 +191,11 @@
         <button onclick="setCondition('normal')">不实不虚</button>
     </div>
 
+    <div class="controls" style="margin-top: 5px;">
+        <input type="datetime-local" id="customDateTime" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); font-size: 0.75rem; height: 30px;">
+        <button onclick="calculateForCustomDate()">指定时间查询</button>
+    </div>
+
     <div class="info-panel" id="info">
         <b>操作说明</b>：本罗盘已加入<b>日干支计算逻辑</b>。点击“当前开穴”将自动根据实时历法推算子午流注开穴与灵龟八法卦象。
     </div>
@@ -366,8 +371,8 @@
             }
         }
 
-        function calculateAndAlign() {
-            const now = new Date();
+        function calculateAndAlign(customDate = null) {
+            const now = customDate || new Date();
             const gz = getGanZhi(now);
             
             // 1. 子午流注对齐 (地支)
@@ -407,8 +412,10 @@
                     break;
             }
 
+            const dateLabel = customDate ? '指定时间' : '今日历法';
+
             document.getElementById('info').innerHTML = `
-                <div style="margin-bottom: 6px; font-size: 0.9rem;">📅 <b>今日历法</b>：${gz.dayStem}${gz.dayBranch}日 ${gz.hourStem}${gz.hourBranch}时</div>
+                <div style="margin-bottom: 6px; font-size: 0.9rem;">📅 <b>${dateLabel}</b>：${gz.dayStem}${gz.dayBranch}日 ${gz.hourStem}${gz.hourBranch}时</div>
                 
                 <div style="margin-bottom: 6px; padding: 6px; background: rgba(139,0,0,0.1); border-radius: 4px; font-size: 0.85rem;">
                     <b>🩸 子午流注 - 地支选穴</b><br>
@@ -431,6 +438,16 @@
                     属 <span class="gold-highlight">${feitengPoint.d}</span> 卦，开 <span class="gold-highlight">${feitengPoint.m}</span> (通${feitengPoint.s})
                 </div>
             `;
+        }
+
+        function calculateForCustomDate() {
+            const dateTimeInput = document.getElementById('customDateTime').value;
+            if (!dateTimeInput) {
+                alert('请选择日期和时间');
+                return;
+            }
+            const customDate = new Date(dateTimeInput);
+            calculateAndAlign(customDate);
         }
 
         init();
