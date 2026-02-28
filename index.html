@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -65,7 +66,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
             cursor: grab;
             user-select: none;
             transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
@@ -73,12 +74,38 @@
             border: 1px solid var(--border-color);
         }
 
-        .layer:active { cursor: grabbing; transition: none; }
+        .layer:active {
+            cursor: grabbing;
+            transition: none;
+        }
 
-        .layer-0 { width: 100%; height: 100%; z-index: 1; }
-        .layer-1 { width: 82%; height: 82%; z-index: 2; border-color: var(--gold-accent); }
-        .layer-2 { width: 64%; height: 64%; z-index: 3; background: #fdfaf2; }
-        .layer-3 { width: 38%; height: 38%; z-index: 4; background: #fcfcfc; font-weight: bold; }
+        .layer-0 {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .layer-1 {
+            width: 82%;
+            height: 82%;
+            z-index: 2;
+            border-color: var(--gold-accent);
+        }
+
+        .layer-2 {
+            width: 64%;
+            height: 64%;
+            z-index: 3;
+            background: #fdfaf2;
+        }
+
+        .layer-3 {
+            width: 38%;
+            height: 38%;
+            z-index: 4;
+            background: #fcfcfc;
+            font-weight: bold;
+        }
 
         .center-dot {
             position: absolute;
@@ -93,7 +120,7 @@
             justify-content: center;
             color: white;
             font-size: 0.8rem;
-            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
             text-align: center;
         }
 
@@ -109,13 +136,41 @@
             width: 70px;
         }
 
-        .layer-0 .label { padding-top: 5px; font-size: 0.6rem; }
-        .layer-1 .label { padding-top: 8px; font-size: 0.75rem; color: var(--gold-accent); }
-        .layer-2 .label { padding-top: 10px; font-size: 0.8rem; }
-        .layer-3 .label { padding-top: 12px; font-size: 1rem; color: var(--accent-color); }
+        .layer-0 .label {
+            padding-top: 5px;
+            font-size: 0.6rem;
+        }
 
-        .sub-info { font-size: 0.5rem; opacity: 0.8; margin-top: 1px; }
-        .points-list { font-size: 0.45rem; color: #666; width: 45px; line-height: 1; margin-top: 2px; }
+        .layer-1 .label {
+            padding-top: 8px;
+            font-size: 0.75rem;
+            color: var(--gold-accent);
+        }
+
+        .layer-2 .label {
+            padding-top: 10px;
+            font-size: 0.8rem;
+        }
+
+        .layer-3 .label {
+            padding-top: 12px;
+            font-size: 1rem;
+            color: var(--accent-color);
+        }
+
+        .sub-info {
+            font-size: 0.5rem;
+            opacity: 0.8;
+            margin-top: 1px;
+        }
+
+        .points-list {
+            font-size: 0.45rem;
+            color: #666;
+            width: 45px;
+            line-height: 1;
+            margin-top: 2px;
+        }
 
         .indicator {
             position: absolute;
@@ -125,6 +180,7 @@
             background: var(--accent-color);
             z-index: 10;
         }
+
         .indicator::after {
             content: "▼";
             position: absolute;
@@ -134,7 +190,17 @@
             font-size: 12px;
         }
 
-        .controls { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; z-index: 20; justify-content: center; align-items: center; flex-shrink: 0; }
+        .controls {
+            margin-top: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            z-index: 20;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
         button {
             padding: 6px 10px;
             background: var(--accent-color);
@@ -148,13 +214,16 @@
             box-sizing: border-box;
             white-space: nowrap;
         }
-        button.btn-alt { background: var(--gold-accent); }
+
+        button.btn-alt {
+            background: var(--gold-accent);
+        }
 
         .info-panel {
             margin-top: 8px;
             padding: 8px;
             flex-shrink: 0;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 5px;
             width: 90%;
             max-width: 480px;
@@ -162,11 +231,19 @@
             line-height: 1.5;
             border-left: 4px solid var(--accent-color);
         }
-        
-        .highlight { color: var(--accent-color); font-weight: bold; }
-        .gold-highlight { color: var(--gold-accent); font-weight: bold; }
+
+        .highlight {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .gold-highlight {
+            color: var(--gold-accent);
+            font-weight: bold;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="header">
@@ -175,12 +252,12 @@
 
     <div class="compass-container" id="compass">
         <div class="indicator"></div>
-        
+
         <div class="layer layer-0" id="layer-0"></div>
         <div class="layer layer-1" id="layer-1"></div>
         <div class="layer layer-2" id="layer-2"></div>
         <div class="layer layer-3" id="layer-3"></div>
-        
+
         <div class="center-dot">医道<br>合一</div>
     </div>
 
@@ -192,7 +269,8 @@
     </div>
 
     <div class="controls" style="margin-top: 5px;">
-        <input type="datetime-local" id="customDateTime" style="padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); font-size: 0.75rem; height: 30px;">
+        <input type="datetime-local" id="customDateTime"
+            style="padding: 6px; border-radius: 4px; border: 1px solid var(--border-color); font-size: 0.75rem; height: 30px;">
         <button onclick="calculateForCustomDate()">指定时间查询</button>
     </div>
 
@@ -204,16 +282,16 @@
         // 灵龟八法常量配置
         const STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
         const BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
-        
+
         // 灵龟八法配数
         // 逐日干支配数（八法逐日干支歌）
         const dayStemValues = { "甲": 10, "己": 10, "乙": 9, "庚": 9, "丁": 8, "壬": 8, "戊": 7, "癸": 7, "丙": 7, "辛": 7 };
         const dayBranchValues = { "辰": 10, "戌": 10, "丑": 10, "未": 10, "申": 9, "酉": 9, "寅": 8, "卯": 8, "巳": 7, "午": 7, "亥": 7, "子": 7 };
-        
+
         // 临时干支配数（八法临时干支歌）
         const hourStemValues = { "甲": 9, "己": 9, "乙": 8, "庚": 8, "丙": 7, "辛": 7, "丁": 6, "壬": 6, "戊": 5, "癸": 5 };
         const hourBranchValues = { "子": 9, "午": 9, "丑": 8, "未": 8, "寅": 7, "申": 7, "卯": 6, "酉": 6, "辰": 5, "戌": 5, "巳": 4, "亥": 4 };
-        
+
         // 卦象对应穴位 (1-9) - 灵龟八法
         // 歌诀：坎一联申脉，照海坤二五，震三属外关，巽四临泣数，乾六是公孙，兑七后溪府，艮八系内关，离九列缺主。
         const trigramPoints = {
@@ -260,17 +338,35 @@
             "癸": { shu: '涌泉', jing: '复溜', he: '阴谷' }
         };
 
+        // 子午流注纳子法 - 时辰对应的开穴
+        const naZiPoints = [
+            { time: '子', organ: '胆经', wuxing: '木', deficiency: '侠溪', excess: '阳辅', ben: '临泣', yuan: '丘虚' },
+            { time: '丑', organ: '肝经', wuxing: '木', deficiency: '曲泉', excess: '行间', ben: '大敦', yuan: '太冲' },
+            { time: '寅', organ: '肺经', wuxing: '金', deficiency: '太渊', excess: '尺泽', ben: '经渠', yuan: '太渊' },
+            { time: '卯', organ: '大肠', wuxing: '金', deficiency: '曲池', excess: '二间', ben: '商阳', yuan: '合谷' },
+            { time: '辰', organ: '胃经', wuxing: '土', deficiency: '解溪', excess: '厉兑', ben: '三里', yuan: '冲阳' },
+            { time: '巳', organ: '脾经', wuxing: '土', deficiency: '大都', excess: '商丘', ben: '太白', yuan: '太白' },
+            { time: '午', organ: '心经', wuxing: '火', deficiency: '少冲', excess: '神门', ben: '少府', yuan: '神门' },
+            { time: '未', organ: '小肠', wuxing: '火', deficiency: '后溪', excess: '小海', ben: '阳谷', yuan: '腕骨' },
+            { time: '申', organ: '膀胱', wuxing: '水', deficiency: '至阴', excess: '束骨', ben: '通谷', yuan: '京骨' },
+            { time: '酉', organ: '肾经', wuxing: '水', deficiency: '复溜', excess: '涌泉', ben: '阴谷', yuan: '太溪' },
+            { time: '戌', organ: '心包', wuxing: '火', deficiency: '中冲', excess: '大陵', ben: '大陵', yuan: '大陵' },
+            { time: '亥', organ: '三焦', wuxing: '火', deficiency: '中渚', excess: '关冲', ben: '关冲', yuan: '阳池' }
+        ];
+
         const layersConfig = [
             { id: 'layer-0', items: ['23-1 子', '1-3 丑', '3-5 寅', '5-7 卯', '7-9 辰', '9-11 巳', '11-13 午', '13-15 未', '15-17 申', '17-19 酉', '19-21 戌', '21-23 亥'] },
             { id: 'layer-1', items: compassOrder.map(k => trigramPoints[k]) }, // 使用后天八卦顺序
-            { id: 'layer-2', items: [
-                {n: '胆经', p: ['窍阴', '侠溪', '临泣', '阳辅', '阳陵泉']}, {n: '肝经', p: ['大敦', '行间', '太冲', '中封', '曲泉']},
-                {n: '肺经', p: ['少商', '鱼际', '太渊', '经渠', '尺泽']}, {n: '大肠', p: ['商阳', '二间', '三间', '阳溪', '曲池']},
-                {n: '胃经', p: ['厉兑', '内庭', '陷谷', '解溪', '足三里']}, {n: '脾经', p: ['隐白', '大都', '太白', '商丘', '阴陵泉']},
-                {n: '心经', p: ['少冲', '少府', '神门', '灵道', '少海']}, {n: '小肠', p: ['少泽', '前谷', '后溪', '阳谷', '小海']},
-                {n: '膀胱', p: ['至阴', '通谷', '束骨', '昆仑', '委中']}, {n: '肾经', p: ['涌泉', '然谷', '太溪', '复溜', '阴谷']},
-                {n: '心包', p: ['中冲', '劳宫', '大陵', '间使', '曲泽']}, {n: '三焦', p: ['关冲', '液门', '中渚', '支沟', '天井']}
-            ]},
+            {
+                id: 'layer-2', items: [
+                    { n: '胆经', p: ['窍阴', '侠溪', '临泣', '阳辅', '阳陵泉'] }, { n: '肝经', p: ['大敦', '行间', '太冲', '中封', '曲泉'] },
+                    { n: '肺经', p: ['少商', '鱼际', '太渊', '经渠', '尺泽'] }, { n: '大肠', p: ['商阳', '二间', '三间', '阳溪', '曲池'] },
+                    { n: '胃经', p: ['厉兑', '内庭', '陷谷', '解溪', '足三里'] }, { n: '脾经', p: ['隐白', '大都', '太白', '商丘', '阴陵泉'] },
+                    { n: '心经', p: ['少冲', '少府', '神门', '灵道', '少海'] }, { n: '小肠', p: ['少泽', '前谷', '后溪', '阳谷', '小海'] },
+                    { n: '膀胱', p: ['至阴', '通谷', '束骨', '昆仑', '委中'] }, { n: '肾经', p: ['涌泉', '然谷', '太溪', '复溜', '阴谷'] },
+                    { n: '心包', p: ['中冲', '劳宫', '大陵', '间使', '曲泽'] }, { n: '三焦', p: ['关冲', '液门', '中渚', '支沟', '天井'] }
+                ]
+            },
             { id: 'layer-3', items: BRANCHES }
         ];
 
@@ -282,22 +378,22 @@
             const month = date.getMonth() + 1; // 转换为1-12月
             const day = date.getDate();
             const hour = date.getHours();
-            
+
             // 使用 lunar-javascript 库计算日干支
             const lunar = Lunar.fromDate(date);
             const dayGanZhi = lunar.getDayInGanZhi();
             const dayStem = dayGanZhi.substring(0, 1);
             const dayBranch = dayGanZhi.substring(1, 2);
-            
+
             // 计算时干支
             const hourIndex = Math.floor(((hour + 1) % 24) / 2);
             const hourBranch = BRANCHES[hourIndex];
-            
+
             // 时干 = (日干序*2 + 时支序) % 10
             const dayStemIndex = STEMS.indexOf(dayStem);
             const hourStemIndex = ((dayStemIndex * 2 + hourIndex) % 10 + 10) % 10;
             const hourStem = STEMS[hourStemIndex];
-            
+
             return { dayStem, dayBranch, hourStem, hourBranch, hourIndex };
         }
 
@@ -329,7 +425,7 @@
 
         function getAngle(clientX, clientY) {
             const rect = document.getElementById('compass').getBoundingClientRect();
-            return Math.atan2(clientY - (rect.top + rect.height/2), clientX - (rect.left + rect.width/2)) * 180 / Math.PI;
+            return Math.atan2(clientY - (rect.top + rect.height / 2), clientX - (rect.left + rect.width / 2)) * 180 / Math.PI;
         }
 
         function startDrag(e, idx) {
@@ -348,8 +444,8 @@
         }
 
         function endDrag() { state.isDragging = false; }
-        function updateUI() { 
-            layersConfig.forEach((l, i) => document.getElementById(l.id).style.transform = `rotate(${state.rotations[i]}deg)`); 
+        function updateUI() {
+            layersConfig.forEach((l, i) => document.getElementById(l.id).style.transform = `rotate(${state.rotations[i]}deg)`);
         }
 
         function resetCompass() { state.rotations = [0, 0, 0, 0]; updateUI(); }
@@ -359,34 +455,17 @@
             calculateAndAlign(); // 重新计算开穴
         }
 
-        function getSelectedPoints(organData, condition) {
-            const allPoints = organData.p;
-            switch(condition) {
-                case 'excess':
-                    // 实症：选择井穴、荥穴、输穴
-                    return allPoints.slice(0, 3);
-                case 'deficiency':
-                    // 虚症：选择输穴、经穴、合穴
-                    return allPoints.slice(2, 5);
-                case 'normal':
-                    // 不实不虚：选择荥穴、输穴、经穴
-                    return allPoints.slice(1, 4);
-                default:
-                    return allPoints;
-            }
-        }
-
         function calculateAndAlign(customDate = null) {
             const now = customDate || new Date();
             const gz = getGanZhi(now);
-            
+
             // 1. 子午流注对齐 (地支)
             const targetRotZiWu = -(gz.hourIndex * 30);
-            
+
             // 2. 灵龟八法计算
             // 使用逐日干支配数和临时干支配数
             const lingguiSum = dayStemValues[gz.dayStem] + dayBranchValues[gz.dayBranch] + hourStemValues[gz.hourStem] + hourBranchValues[gz.hourBranch];
-            
+
             // 判断阳日或阴日
             const yangStems = ["甲", "丙", "戊", "庚", "壬"];
             const isYangDay = yangStems.includes(gz.dayStem);
@@ -403,7 +482,7 @@
             }
 
             const lingguiPoint = trigramPoints[lingguiRemainder];
-            
+
             // 计算目标旋转角度
             // 如果余数是5 (中五)，则寄于坤二
             const targetNum = (lingguiRemainder === 5) ? 2 : lingguiRemainder;
@@ -414,42 +493,30 @@
             // 3. 飞腾八法计算 - 直接用时干决定
             const feitengPoint = feitengPoints[gz.hourStem];
 
+            // 4. 纳子法计算
+            const naZiData = naZiPoints[gz.hourIndex];
+
             state.rotations = [targetRotZiWu, targetRotBaFa, targetRotZiWu, targetRotZiWu];
             updateUI();
 
-            const organData = layersConfig[2].items[gz.hourIndex];
-            const selectedPoints = getSelectedPoints(organData, state.condition);
-            
             // 纳甲法开穴
             const naJia = naJiaPoints[gz.dayStem];
-            
-            let conditionText = '';
-            switch(state.condition) {
-                case 'excess':
-                    conditionText = '实症';
-                    break;
-                case 'deficiency':
-                    conditionText = '虚症';
-                    break;
-                case 'normal':
-                    conditionText = '不实不虚';
-                    break;
-            }
 
             const dateLabel = customDate ? '指定时间' : '今日历法';
 
             document.getElementById('info').innerHTML = `
                 <div style="margin-bottom: 6px; font-size: 0.9rem;">📅 <b>${dateLabel}</b>：${gz.dayStem}${gz.dayBranch}日 ${gz.hourStem}${gz.hourBranch}时</div>
                 
-                <div style="margin-bottom: 6px; padding: 6px; background: rgba(139,0,0,0.1); border-radius: 4px; font-size: 0.85rem;">
-                    <b>🩸 子午流注 - 地支选穴</b><br>
-                    <span class="highlight">${organData.n}</span> 气血最旺
-                    ${conditionText}推荐：<span class="highlight">${selectedPoints.join(' ')}</span>
-                </div>
-                
                 <div style="margin-bottom: 6px; padding: 6px; background: rgba(166,124,0,0.1); border-radius: 4px; font-size: 0.85rem;">
                     <b>🩸 子午流注 - 纳甲法</b><br>
                     日干 ${gz.dayStem} 对应：<span class="highlight">${naJia.shu} ${naJia.jing} ${naJia.he}</span>
+                </div>
+                
+                <div style="margin-bottom: 6px; padding: 6px; background: rgba(255,165,0,0.1); border-radius: 4px; font-size: 0.85rem;">
+                    <b>🩸 子午流注 - 纳子法</b><br>
+                    ${naZiData.time}时 <span class="highlight">${naZiData.organ}</span> (${naZiData.wuxing}属性)<br>
+                    虚证：<span class="highlight">${naZiData.deficiency}</span> | 实证：<span class="highlight">${naZiData.excess}</span><br>
+                    本穴：<span class="highlight">${naZiData.ben}</span> | 原穴：<span class="highlight">${naZiData.yuan}</span>
                 </div>
                 
                 <div style="margin-bottom: 6px; padding: 6px; background: rgba(0,100,0,0.1); border-radius: 4px; font-size: 0.85rem;">
@@ -477,4 +544,5 @@
         init();
     </script>
 </body>
+
 </html>
